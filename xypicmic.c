@@ -32,11 +32,9 @@ typedef struct {
     bool intersects;
 } IntersectionPoint;
 
-
 double tan_deg(double angle) {
     return tan(angle * PI / 180.0);
 }
-
 
 void extractRYBi(const char *name, char *RYBi) {
     const char *start = strchr(name, '<');
@@ -105,7 +103,6 @@ IntersectionPoint calculateIntersection(LineCoordinates line1, LineCoordinates l
     return result;
 }
 
-
 void replaceBackslashes(char *str) {
     while (*str) {
         if (*str == '\\') *str = '/';
@@ -130,7 +127,6 @@ IntersectionPoint calculateCentroid(IntersectionPoint *cluster, int size) {
     return centroid;
 }
 
-
 int main(int argc, char *argv[]) {
    
     if (argc < 3) {
@@ -144,7 +140,6 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-
     char cwd[PATH_MAX];
     if (getcwd(cwd, sizeof(cwd)) == NULL) {
         perror("getcwd() error");
@@ -152,22 +147,18 @@ int main(int argc, char *argv[]) {
     }
     replaceBackslashes(cwd); 
 
-    
     char fileTablePath[PATH_MAX];
     snprintf(fileTablePath, sizeof(fileTablePath), "%s/picmic_adress_table.tab", cwd);
 
-    
     char arr[ROWS][COLS][MAX_NAME_LENGTH] = {0};
     RowCol getPisteRowCol[1000];
 
-    
     FILE *file = fopen(fileTablePath, "r");
     if (file == NULL) {
         perror("Error opening file");
         return -1;
     }
 
-    
     char line[MAX_LINE_LENGTH];
     while (fgets(line, sizeof(line), file)) {
         char name[MAX_NAME_LENGTH], RYBi[MAX_NAME_LENGTH];
@@ -180,13 +171,11 @@ int main(int argc, char *argv[]) {
     }
     fclose(file); 
 
-    
     time_t now = time(NULL);
     struct tm *t = localtime(&now);
 
     char filename[64];
     strftime(filename, sizeof(filename), "coordinates_%Y%m%d_%H%M%S.csv", t);
-
 
     FILE *csvFile = fopen(filename, "w");
     if (csvFile == NULL) {
@@ -196,12 +185,10 @@ int main(int argc, char *argv[]) {
 
     fprintf(csvFile, "Row,Col,X_start,Y_start,X_end,Y_end\n"); 
 
-
     for (int i = 0; i < numElements; i++) {
         int userInputRow = atoi(argv[2 + i * 2]); 
         int userInputCol = atoi(argv[3 + i * 2]); 
 
-        
         if (userInputRow >= 0 && userInputRow < ROWS && userInputCol >= 0 && userInputCol < COLS) {
             char *value = arr[userInputRow][userInputCol]; 
             char lineType = value[0]; 
@@ -228,10 +215,8 @@ int main(int argc, char *argv[]) {
     }
     fclose(csvFile); 
 
-
     char intersectionsFilename[64];
     strftime(intersectionsFilename, sizeof(intersectionsFilename), "intersections_%Y%m%d_%H%M%S.csv", t);
-
 
     FILE *intersectionsFile = fopen(intersectionsFilename, "w");
     if (intersectionsFile == NULL) {
@@ -243,7 +228,6 @@ int main(int argc, char *argv[]) {
     IntersectionPoint intersectionPoints[numElements * (numElements - 1) / 2]; // Tableau pour stocker les points d'intersection.
     int intersectionCount = 0; 
 
-    
     for (int i = 0; i < numElements; i++) {
         for (int j = i + 1; j < numElements; j++) {
             int row1 = atoi(argv[2 + i * 2]); 
