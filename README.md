@@ -20,7 +20,7 @@ git branch -M main
 git push -uf origin main
 ```
 
-## To coppile
+## To compile
 gcc -lm xypicmic.c
 
 -lm flag just make the link to the math's library ``link math``
