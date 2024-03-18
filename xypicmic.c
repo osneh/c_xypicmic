@@ -90,14 +90,19 @@ IntersectionPoint calculateCentroid(IntersectionPoint *cluster, int size) {
 
 //int y_idx = 0;int r_idx = 0;int b_idx = 0;
 // -----------------------------
-void splitLineColor(unsigned int y, LineCoordinates *y1, unsigned int r, LineCoordinates *r1, unsigned int b, LineCoordinates *b1, LineCoordinates *Items, unsigned int nItems) {
+//void splitLineColor(unsigned int y, LineCoordinates *y1, unsigned int r, LineCoordinates *r1, unsigned int b, LineCoordinates *b1, LineCoordinates *Items, unsigned int nItems) {
+//void splitLineColor(LineCoordinates *Items, unsigned int nItems, LineCoordinates *y1, unsigned int y , LineCoordinates *r1, unsigned int r, LineCoordinates *b1, unsigned int b) {
+void splitLineColor(LineCoordinates *Items, int nItems, LineCoordinates *ly, int *y , LineCoordinates *lr, int *r, LineCoordinates *lb, int *b) {
+    int unsigned temp_y = 0; unsigned int temp_r=0; unsigned int temp_b=0;
     for ( int j = 0 ; j < nItems; ++j){
         char ltype =  Items[j].type ;
-        printf("%c%d\n",ltype,Items[j].val);
+        //printf("--%c%d\n",ltype,Items[j].val);
     
-        if ( ltype == 'Y') y1[y++] = Items[j];
-        else if ( ltype == 'R' ) r1[r++] = Items[j];
-        else if ( ltype == 'B' ) b1[b++] = Items[j];
+        if ( ltype == 'Y') ly[temp_y++] = Items[j];
+        else if ( ltype == 'R' ) lr[temp_r++] = Items[j];
+        else if ( ltype == 'B' ) lb[temp_b++] = Items[j];
     }
-    printf("after loop yellow=%d, blue=%d, red=%d\n",y,b,r);
+    *y=temp_y;
+    *r=temp_r; 
+    *b=temp_b;
 }

@@ -89,12 +89,12 @@ int main(int argc, char *argv[]) {
     LineCoordinates *rlines = (LineCoordinates *)malloc(r_size * sizeof(LineCoordinates));
     LineCoordinates *blines = (LineCoordinates *)malloc(b_size * sizeof(LineCoordinates));
 
-    LineCoordinates *ty = (LineCoordinates *)malloc(y_size * sizeof(LineCoordinates));
-    LineCoordinates *tr = (LineCoordinates *)malloc(r_size * sizeof(LineCoordinates));
-    LineCoordinates *tb = (LineCoordinates *)malloc(b_size * sizeof(LineCoordinates));
+    //LineCoordinates *ty = (LineCoordinates *)malloc(y_size * sizeof(LineCoordinates));
+    //LineCoordinates *tr = (LineCoordinates *)malloc(r_size * sizeof(LineCoordinates));
+    //LineCoordinates *tb = (LineCoordinates *)malloc(b_size * sizeof(LineCoordinates));
 
-    int y_idx = 0;int r_idx = 0;int b_idx = 0;
-    // -----------------------------
+    int y_idx =0;int r_idx =0;int b_idx = 0;
+    /*
     for ( int j = 0 ; j < numElements; ++j){
         char ltype =  lineInEvent[j].type ;
         printf("%c%d\n",ltype,lineInEvent[j].val);
@@ -111,14 +111,24 @@ int main(int argc, char *argv[]) {
             b_idx+=1;
         }
     }
-
-    printf("---------------------- My Test --------------------------\n");
+    */
+    //printf("---------------------- My Test --------------------------\n");
     // -----------------------------
-    unsigned int uno = 0 ; unsigned int dos = 0 ; unsigned int tres = 0 ;
-    splitLineColor(uno, dos, tres, lineInEvent, numElements ) ;
+    //int uno =0 ; int dos =0 ; int tres =0 ;
+    splitLineColor(lineInEvent,numElements, ylines,&y_idx,rlines,&r_idx,blines,&b_idx) ;
+    //printf("ysize=%d , rsize=%d, bsize=%d\n",y_idx,r_idx,b_idx);
+
+
+    //for (int i =0 ; i<r_idx; i++){
+    //    printf("-----%c%d\n",tr[i].type,tr[i].val);
+    //}
     printf("------------------- END My Test --------------------------\n");
+
+    
+
+
     // ----------------------------------------------------
-    IntersectionPoint intersections[y_size*r_size + y_size*b_size + b_size*r_size ];
+    IntersectionPoint intersections[y_size*r_size + y_size*b_size + b_size*r_size];
     int interCount = 0;
 
         if (y_size>0){
