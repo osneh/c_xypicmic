@@ -32,5 +32,7 @@ LineCoordinates calculateLineCoordinates(char , int );
 IntersectionPoint calculateIntersection(LineCoordinates line1, LineCoordinates line2);
 IntersectionPoint calculateCentroid(IntersectionPoint *cluster, int size);
 void splitLineColor(LineCoordinates *, int ,LineCoordinates *, int *, LineCoordinates *, int *, LineCoordinates *, int *); 
+void xLines(IntersectionPoint *, int ,LineCoordinates *, int , LineCoordinates *, int , LineCoordinates * , int , int * );
+void fillCentroids(IntersectionPoint *, int , IntersectionPoint * , int  );
 
 #endif /* XYPICMIC_H */

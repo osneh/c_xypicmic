@@ -82,85 +82,34 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // --------------------------
-    // Arrays allocation (according her Line Color)
-    // --------------------------
+    // -----------------------------------------------------------------
+    // Arrays of struct allocation (according ot its' color)
+    // -----------------------------------------------------------------
     LineCoordinates *ylines = (LineCoordinates *)malloc(y_size * sizeof(LineCoordinates));
     LineCoordinates *rlines = (LineCoordinates *)malloc(r_size * sizeof(LineCoordinates));
     LineCoordinates *blines = (LineCoordinates *)malloc(b_size * sizeof(LineCoordinates));
 
-    //LineCoordinates *ty = (LineCoordinates *)malloc(y_size * sizeof(LineCoordinates));
-    //LineCoordinates *tr = (LineCoordinates *)malloc(r_size * sizeof(LineCoordinates));
-    //LineCoordinates *tb = (LineCoordinates *)malloc(b_size * sizeof(LineCoordinates));
-
     int y_idx =0;int r_idx =0;int b_idx = 0;
-    /*
-    for ( int j = 0 ; j < numElements; ++j){
-        char ltype =  lineInEvent[j].type ;
-        printf("%c%d\n",ltype,lineInEvent[j].val);
-        if ( ltype == 'Y') { 
-            ylines[y_idx++] = lineInEvent[j];
-            y_idx+=1;
-        }
-        else if ( ltype == 'R' ) {
-            rlines[r_idx] = lineInEvent[j];
-            r_idx+=1;    
-        }
-        else if ( ltype == 'B' ) {
-            blines[b_idx] = lineInEvent[j];
-            b_idx+=1;
-        }
+    splitLineColor(lineInEvent,numElements, ylines,&y_idx,rlines,&r_idx,blines,&b_idx);
+
+    // -----------------------------------------------------------------
+    // compute intersections and keep these in an array
+    // -----------------------------------------------------------------
+    int interCount = 0;
+    int combinations = y_size*r_size + y_size*b_size + b_size*r_size;
+    IntersectionPoint *intersections;
+    if (combinations>0){
+        intersections = (IntersectionPoint *)malloc(combinations * sizeof(IntersectionPoint));
+        //IntersectionPoint intersections[combinations];
+        xLines(intersections,combinations,ylines,y_size,rlines,r_size,blines,b_size,&interCount);
     }
-    */
-    //printf("---------------------- My Test --------------------------\n");
-    // -----------------------------
-    //int uno =0 ; int dos =0 ; int tres =0 ;
-    splitLineColor(lineInEvent,numElements, ylines,&y_idx,rlines,&r_idx,blines,&b_idx) ;
-    //printf("ysize=%d , rsize=%d, bsize=%d\n",y_idx,r_idx,b_idx);
-
-
-    //for (int i =0 ; i<r_idx; i++){
-    //    printf("-----%c%d\n",tr[i].type,tr[i].val);
+    //printf("=======================================================\n");
+    //printf("counter=%d\n",interCount);
+    //for ( int z = 0 ; z<interCount; z++){
+    // printf("z=%d,x=%0.2f,y=%0.2f\n", z,intersections[z].x, intersections[z].y);
     //}
-    printf("------------------- END My Test --------------------------\n");
-
-    
-
 
     // ----------------------------------------------------
-    IntersectionPoint intersections[y_size*r_size + y_size*b_size + b_size*r_size];
-    int interCount = 0;
-
-        if (y_size>0){
-            for (int idx = 0 ; idx<y_size; idx++){              // Yellow lines Loop
-                for (int jdx = 0 ; jdx<r_size; jdx++){          // Red lines Loop 
-                    IntersectionPoint intersection = calculateIntersection(ylines[idx],rlines[jdx]);
-                    intersections[interCount++] = intersection;
-                }
-
-                for (int kdx = 0 ; kdx<b_size; kdx++){          // Blue lines Loop 
-                    IntersectionPoint intersection = calculateIntersection(ylines[idx],blines[kdx]);
-                    intersections[interCount++] = intersection;
-                }
-            }
-        }
-
-        if (r_size>0 && b_size > 0 ) {              // Red and Blue lines Loop
-            for (int idx = 0; idx<r_size; idx++){
-                for (int jdx = 0 ; jdx<b_size; jdx++){
-                    IntersectionPoint intersection = calculateIntersection(rlines[idx],blines[jdx]);
-                    intersections[interCount++] = intersection; 
-                }
-            }
-        }
-
-    // -----------------------------------------------------
-    
-    printf("intercount=%d\n",interCount);
-    for ( int z = 0 ; z<interCount; z++){
-        printf("z=%d,x=%0.2f,y=%0.2f\n", z,intersections[z].x, intersections[z].y);
-    }
-    
     // ---------------------------------------------
     int clustered[interCount];
 	memset(clustered,0,interCount*sizeof(int));
@@ -182,12 +131,29 @@ int main(int argc, char *argv[]) {
                 }
             }
             IntersectionPoint centroid = calculateCentroid(cluster, clusterSize);
+            printf("Centroid --> x=%0.2f ,\t y=%0.2f\n",centroid.x,centroid.y);
         }
     }
+
+    //------------------------------------------------
+    printf("=========== My Test ============== \n");
+    //int myclustered[interCount];
+    //memset(myclustered,0,interCount*sizeof(int));
+    IntersectionPoint centroids[interCount];
+    fillCentroids(intersections,interCount, centroids, interCount );
+    
+    for (int n = 0; n<interCount;n++){
+        printf("n=%d\t x=%0.2f \t y=%0.2f\n",n,centroids[n].x, centroids[n].y);
+    }
+    //printf("Centroid --> x=%0.2f ,\t y=%0.2f\n",centroid.x,centroid.y);
+
+
+
 
     free(ylines);
     free(rlines);
     free(blines);
+    free(intersections);
 
     return 0; 
 }

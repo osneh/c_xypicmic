@@ -79,12 +79,20 @@ IntersectionPoint calculateIntersection(LineCoordinates line1, LineCoordinates l
 
 IntersectionPoint calculateCentroid(IntersectionPoint *cluster, int size) {
     IntersectionPoint centroid = {0, 0, false};
+    
     for (int i = 0; i < size; i++) {
         centroid.x += cluster[i].x;
         centroid.y += cluster[i].y;
     }
-    centroid.x /= size;
-    centroid.y /= size;
+    if (size!=0){    
+        centroid.x /= size;
+        centroid.y /= size;
+    }
+    else {
+        centroid.x = -999999;
+        centroid.y = -999999;
+    }
+    
     return centroid;
 }
 
@@ -105,4 +113,59 @@ void splitLineColor(LineCoordinates *Items, int nItems, LineCoordinates *ly, int
     *y=temp_y;
     *r=temp_r; 
     *b=temp_b;
+}
+
+void xLines(IntersectionPoint *intersecs, int nIntersecs,LineCoordinates *yellow, int y_size, LineCoordinates *red, int r_size, LineCoordinates * blue, int b_size, int * counter){
+        int iCount =0;
+        if (y_size>0){
+            for (int idx = 0 ; idx<y_size; idx++){              // Yellow lines Loop
+                for (int jdx = 0 ; jdx<r_size; jdx++){          // Red lines Loop 
+                    IntersectionPoint intersection = calculateIntersection(yellow[idx],red[jdx]);
+                    intersecs[iCount++] = intersection;
+                }
+
+                for (int kdx = 0 ; kdx<b_size; kdx++){          // Blue lines Loop 
+                    IntersectionPoint intersection = calculateIntersection(yellow[idx],blue[kdx]);
+                    intersecs[iCount++] = intersection;
+                }
+            }
+        }
+
+        if (r_size>0 && b_size > 0 ) {              // Red and Blue lines Loop
+            for (int idx = 0; idx<r_size; idx++){
+                for (int jdx = 0 ; jdx<b_size; jdx++){
+                    IntersectionPoint intersection = calculateIntersection(red[idx],blue[jdx]);
+                    intersecs[iCount++] = intersection; 
+                }
+            }
+        }
+    *counter=iCount;
+}
+
+void fillCentroids(IntersectionPoint *myIntersections, int myDimIntersections,IntersectionPoint * arrayCentroid, int nCentroid ){
+
+    int myclustered[myDimIntersections];
+    memset(myclustered,0,myDimIntersections*sizeof(int));
+    unsigned int fillCounter = 0;
+
+    for (int i = 0; i < myDimIntersections; i++) { //printf("HERE12\n");
+        if (!myclustered[i]) {
+            IntersectionPoint cluster[myDimIntersections];      // Tableau temporaire pour stocker un cluster de points.
+            int clusterSize = 0;                                // Taille du cluster.
+            cluster[clusterSize++] = myIntersections[i];        // Ajout du point initial au cluster.
+            myclustered[i] = 1;                                 // Marquage du point comme regroupé.
+            // Recherche d'autres points à inclure dans le cluster.
+            for (int j = i + 1; j < myDimIntersections; j++) {
+                if (!myclustered[j]) {
+                    double dist = distance(myIntersections[i].x, myIntersections[i].y, myIntersections[j].x, myIntersections[j].y);
+                    if (dist <  THRESHOLD) {
+                        cluster[clusterSize++] = myIntersections[j]; // Ajout du point au cluster.
+                        myclustered[j] = 1;                           // Marquage du point comme regroupé.
+                    }
+                }
+            }
+            IntersectionPoint centroid = calculateCentroid(cluster, clusterSize);
+            arrayCentroid[fillCounter++] = centroid;
+        }
+    }
 }
