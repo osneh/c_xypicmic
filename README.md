@@ -21,6 +21,6 @@ git push -uf origin main
 ```
 
 ## To compile
-gcc -lm xypicmic.c xypicmic.c xypicmic.h -o xypicmic.exe
+gcc -lm xypicmic.c xypicmic.c -o xypicmic.exe
 
 -lm flag just make the link to the math's library ``link math``
