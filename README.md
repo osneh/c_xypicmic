@@ -24,3 +24,6 @@ git push -uf origin main
 gcc -lm xypicmic.c xypicmic.c -o xypicmic.exe
 
 -lm flag just make the link to the math's library ``link math``
+
+## To run
+./xypicmic.exe 6 103 35 34 37 75 10 88 44 6 15 68 28
