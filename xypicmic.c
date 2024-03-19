@@ -98,24 +98,15 @@ IntersectionPoint calculateCentroid(IntersectionPoint *cluster, int size) {
     return centroid;
 }
 
-//int y_idx = 0;int r_idx = 0;int b_idx = 0;
-// -----------------------------
-//void splitLineColor(unsigned int y, LineCoordinates *y1, unsigned int r, LineCoordinates *r1, unsigned int b, LineCoordinates *b1, LineCoordinates *Items, unsigned int nItems) {
-//void splitLineColor(LineCoordinates *Items, unsigned int nItems, LineCoordinates *y1, unsigned int y , LineCoordinates *r1, unsigned int r, LineCoordinates *b1, unsigned int b) {
-//void splitLineColor(LineCoordinates *Items, int nItems, LineCoordinates *ly, int *y , LineCoordinates *lr, int *r, LineCoordinates *lb, int *b) {
 void splitLineColor(LineCoordinates *Items, int nItems, LineCoordinates *ly, LineCoordinates *lr, LineCoordinates *lb) {
     int unsigned temp_y = 0; unsigned int temp_r=0; unsigned int temp_b=0;
     for ( int j = 0 ; j < nItems; ++j){
         char ltype =  Items[j].type ;
-        //printf("--%c%d\n",ltype,Items[j].val);
     
         if ( ltype == 'Y') ly[temp_y++] = Items[j];
         else if ( ltype == 'R' ) lr[temp_r++] = Items[j];
         else if ( ltype == 'B' ) lb[temp_b++] = Items[j];
     }
-    //*y=temp_y;
-    //*r=temp_r; 
-    //*b=temp_b;
 }
 
 void xLines(IntersectionPoint *intersecs, int nIntersecs,LineCoordinates *yellow, int y_size, LineCoordinates *red, int r_size, LineCoordinates * blue, int b_size, int * counter){
@@ -168,7 +159,7 @@ void fillCentroids(IntersectionPoint *myIntersections, int myDimIntersections,In
                 }
             }
             IntersectionPoint centroid = calculateCentroid(cluster, clusterSize);
-            printf("INSIDE Centroid --> x=%0.2f ,\t y=%0.2f \t fillCounterValue=%d\n",centroid.x,centroid.y,fillCounter);
+            //printf("INSIDE Centroid --> x=%0.2f ,\t y=%0.2f \t fillCounterValue=%d\n",centroid.x,centroid.y,fillCounter);
             arrayCentroid[fillCounter++] = centroid;
             
         }
@@ -176,7 +167,7 @@ void fillCentroids(IntersectionPoint *myIntersections, int myDimIntersections,In
 }
 
 void fillLines(char *arguments[], LineCoordinates *allLines, int nLines, int *yellowSize , int *redSize, int * blueSize){
-    printf("HELLO\n");
+    //printf("HELLO\n");
      int temp_y= 0; int temp_r=0; int temp_b=0; 
 
      for (int i = 0; i < nLines; i++) {

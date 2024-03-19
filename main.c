@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
     }
       
     // ----------------------------------------------------------------  
-    // fill array of lines per Event   
+    // fill array of lines per Event and count lines by color  
     // ----------------------------------------------------------------  
     LineCoordinates *lineInEvent = (LineCoordinates *)malloc(numElements * sizeof(LineCoordinates));
     
@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
     LineCoordinates *rlines = (LineCoordinates *)malloc(r_size * sizeof(LineCoordinates));
     LineCoordinates *blines = (LineCoordinates *)malloc(b_size * sizeof(LineCoordinates));
     
-    splitLineColor(lineInEvent,numElements, ylines,rlines,blines);
+    splitLineColor(lineInEvent,numElements,ylines,rlines,blines);
 
     // -----------------------------------------------------------------
     // compute intersections, centroids and keep these in an array
