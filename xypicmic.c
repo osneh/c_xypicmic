@@ -4,8 +4,6 @@
 #include <string.h>
 #include <math.h>
 
-//int myarray[ARRAY_SIZE]={1,2,3,4};
-
 void replaceBackslashes(char *str) {
     while (*str) {
         if (*str == '\\') *str = '/';
@@ -58,7 +56,7 @@ LineCoordinates calculateLineCoordinates(char lineType, int value) {
 }
 
 IntersectionPoint calculateIntersection(LineCoordinates line1, LineCoordinates line2) {
-    IntersectionPoint result = {-99999, -99999, false};
+    IntersectionPoint result = {-99999, -99999, false, -1};
     double denominator = (line1.x_start - line1.x_end) * (line2.y_start - line2.y_end) -
                          (line1.y_start - line1.y_end) * (line2.x_start - line2.x_end);
 
@@ -74,16 +72,18 @@ IntersectionPoint calculateIntersection(LineCoordinates line1, LineCoordinates l
     result.x = x;
     result.y = y;
     result.intersects = true;
+    result.flag = colorFlag(line1.type,line2.type);
 
     return result;
 }
 
 IntersectionPoint calculateCentroid(IntersectionPoint *cluster, int size) {
-    IntersectionPoint centroid = {0, 0, false};
+    IntersectionPoint centroid = {0, 0, false, 1};
     
     for (int i = 0; i < size; i++) {
         centroid.x += cluster[i].x;
         centroid.y += cluster[i].y;
+        centroid.flag *= cluster[i].flag;
     }
     /*
     if (size!=0){    
@@ -198,7 +198,36 @@ void fillLines(char *arguments[], LineCoordinates *allLines, int nLines, int *ye
     *yellowSize = temp_y;
     *redSize = temp_r;
     *blueSize = temp_b;
-};
+}
+
+int assign_number(char c) {
+    switch(c) {
+        case 'Y':
+            return 0;
+        case 'B':
+            return 1;
+        case 'R':
+            return 2;
+        default:
+            return -1; // Indicates invalid character
+    }
+}
+
+int colorFlag(char color1, char color2){
+    int num1 = assign_number(color1);
+    int num2 = assign_number(color2);
+
+
+    if ((num1 == 0 && num2 == 1) || (num1 == 1 && num2 == 0))
+        return COMBINATION_YR;
+    else if ((num1 == 0 && num2 == 2) || (num1 == 2 && num2 == 0))
+        return COMBINATION_YB;
+    else if ((num1 == 1 && num2 == 2) || (num1 == 2 && num2 == 1))
+        return COMBINATION_RB;
+    else
+        return -1; // Indicates invalid combination
+
+}
 
 char arr[ROWS][COLS][MAX_NAME_LENGTH]= {
 {{"D0"},{"D128"},{"Y1"},{"D384"},{"D512"},{"Y2"},{"D768"},{"D896"},{"Y3"},{"D1152"},
