@@ -85,6 +85,10 @@ IntersectionPoint calculateCentroid(IntersectionPoint *cluster, int size) {
         centroid.y += cluster[i].y;
         centroid.flag *= cluster[i].flag;
     }
+
+    if ( centroid.flag % 11 == 0 &&  centroid.flag %7 == 0 && centroid.flag % 3 == 0)
+        centroid.intersects = true;
+
     /*
     if (size!=0){    
         centroid.x /= size;
