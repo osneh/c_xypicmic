@@ -167,7 +167,6 @@ void fillCentroids(IntersectionPoint *myIntersections, int myDimIntersections,In
 }
 
 void fillLines(char *arguments[], LineCoordinates *allLines, int nLines, int *yellowSize , int *redSize, int * blueSize){
-    //printf("HELLO\n");
      int temp_y= 0; int temp_r=0; int temp_b=0; 
 
      for (int i = 0; i < nLines; i++) {

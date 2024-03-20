@@ -10,8 +10,6 @@
 #define PI 3.14159265358979323846
 #define THRESHOLD 100.0 
 
-//extern char myarray [ROWS][COLS][MAX_NAME_LENGTH];
-
 extern char arr[ROWS][COLS][MAX_NAME_LENGTH];
 
 typedef struct {
