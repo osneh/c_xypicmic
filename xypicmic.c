@@ -4,6 +4,34 @@
 #include <string.h>
 #include <math.h>
 
+//#define ARRAY_LENGTH(arr) (sizeof(arr) / sizeof(arr[0]))
+
+// c++ not C
+//template<typename T, size_t n> char (& array_size(const T (&)[n]) )[n];
+
+void printIntersectionPoint(IntersectionPoint *item, int numIP) {
+  //   printf("Printing %d persons:\n", numIP);
+    for (int i = 0; i < numIP; ++i) {
+printf("[%2d],x,y,bool,flag=", i+1);
+printf("%f,%f,\t%d, %d:\n", item[i].x, item[i].y, item[i].intersects, item[i].flag);
+    }
+}
+
+// surcharge pour val par defaut imprime tout
+void printIntersectionPoint0(IntersectionPoint *item) {
+  //     int numIP=sizeof(item) / sizeof(*item);
+  int numIP=sizeof(item) / sizeof(item[0]); //<= marche pas?
+     printf("numIP %d, %d, %d\n", numIP, sizeof(item), sizeof(item[0]));
+/*   int numIP=0; */
+/* while ((item + numIP)->x[0] != '\0') { */
+/*         numIP++; */
+/*     } */
+    printIntersectionPoint(item, numIP);
+}
+
+
+
+
 void replaceBackslashes(char *str) {
     while (*str) {
         if (*str == '\\') *str = '/';

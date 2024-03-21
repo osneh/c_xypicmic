@@ -72,6 +72,10 @@ int main(int argc, char *argv[]) {
         printf("Flag=%d -- 3 Lines Different colors=%d -- ,x0=%.02f, y0=%0.2f\n",centroids[idx].flag, centroids[idx].intersects, centroids[idx].x, centroids[idx].y);
     }
 
+    printIntersectionPoint0(centroids); //<== default printall marche pas
+    printIntersectionPoint(centroids,interCount);
+    //    printIntersectionPoint(centroids,10);
+
     free(ylines);
     free(rlines);
     free(blines);
