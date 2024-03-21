@@ -21,6 +21,10 @@ git push -uf origin main
 ```
 
 ## To compile
+git clone https://gitlab.in2p3.fr/h.abreu/c_xypicmic.git
+
+cd c_xypicmic
+
 gcc -lm xypicmic.c xypicmic.c -o xypicmic.exe
 
 -lm flag just make the link to the math's library ``link math``

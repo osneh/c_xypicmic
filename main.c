@@ -38,6 +38,12 @@ int main(int argc, char *argv[]) {
     
     splitLineColor(lineInEvent,numElements,ylines,rlines,blines);
 
+    //  prinout all lines in event :
+    printf("------------------------->>>>  Lines in Event:  <<<<<<<<<<<<<<<<<-----------------\n");
+    for (int idx=0 ; idx< numElements;  idx++){
+        printf("%c%d,x0=%.02f, y0=%0.2f, x1=%0.2f, y1=%0.2f\n",lineInEvent[idx].type,lineInEvent[idx].val , lineInEvent[idx].x_start, lineInEvent[idx].y_start, lineInEvent[idx].x_end, lineInEvent[idx].y_end);
+    }
+
     // -----------------------------------------------------------------
     // compute intersections, centroids and keep these in an array
     // -----------------------------------------------------------------
@@ -49,10 +55,21 @@ int main(int argc, char *argv[]) {
         xLines(intersections,combinations,ylines,y_size,rlines,r_size,blines,b_size,&interCount);
     }
 
+    printf("------------------------->>>>  Intersections in Event:  <<<<<<<<<<<<<<<<<-----------------\n");
+    for (int idx=0 ; idx< interCount;  idx++){
+        printf("Flag=%d -- Intersects=%d -- ,x0=%.02f, y0=%0.2f\n",intersections[idx].flag, intersections[idx].intersects, intersections[idx].x, intersections[idx].y);
+    }
+
+
     IntersectionPoint *centroids;//[interCount];
     if (interCount>0){
         centroids = (IntersectionPoint *)malloc(interCount * sizeof(IntersectionPoint));
         fillCentroids(intersections,interCount, centroids, interCount );
+    }
+
+    printf("------------------------->>>>  centroids in Event:  <<<<<<<<<<<<<<<<<-----------------\n");
+    for (int idx=0 ; idx< interCount;  idx++){
+        printf("Flag=%d -- 3 Lines Different colors=%d -- ,x0=%.02f, y0=%0.2f\n",centroids[idx].flag, centroids[idx].intersects, centroids[idx].x, centroids[idx].y);
     }
 
     free(ylines);
