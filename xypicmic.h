@@ -13,6 +13,8 @@
 #define COMBINATION_YB 7
 #define COMBINATION_RB 5
 
+//11*7*3=231
+
 extern char arr[ROWS][COLS][MAX_NAME_LENGTH];
 
 typedef struct {
@@ -43,6 +45,12 @@ void fillCentroids(IntersectionPoint *, int , IntersectionPoint * , int  );
 void fillLines(char * [],LineCoordinates *, int, int *, int *, int *);
 int colorFlag(char, char);
 int assign_number(char);
+<<<<<<< HEAD
 void assign_clusters(IntersectionPoint *, int , IntersectionPoint * , int  );
+=======
+void printIntersectionPoint(IntersectionPoint *item, int numIP);
+void printIntersectionPoint0(IntersectionPoint *item);
+
+>>>>>>> b93b19e3ba2de48c79c4c5b8be3e397a0eba27a7
 
 #endif /* XYPICMIC_H */
