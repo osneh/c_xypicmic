@@ -8,10 +8,10 @@
 #define MAX_LINE_LENGTH 100
 #define MAX_NAME_LENGTH 20
 #define PI 3.14159265358979323846
-#define THRESHOLD 100.0 
+#define THRESHOLD 100 
 #define COMBINATION_YR 3
 #define COMBINATION_YB 7
-#define COMBINATION_RB 11
+#define COMBINATION_RB 5
 
 extern char arr[ROWS][COLS][MAX_NAME_LENGTH];
 
@@ -28,7 +28,7 @@ typedef struct {
     double x;
     double y;
     bool intersects;
-    int flag;
+    unsigned long flag;
 } IntersectionPoint;
 
 void replaceBackslashes(char *str);
@@ -43,5 +43,6 @@ void fillCentroids(IntersectionPoint *, int , IntersectionPoint * , int  );
 void fillLines(char * [],LineCoordinates *, int, int *, int *, int *);
 int colorFlag(char, char);
 int assign_number(char);
+void assign_clusters(IntersectionPoint *, int , IntersectionPoint * , int  );
 
 #endif /* XYPICMIC_H */

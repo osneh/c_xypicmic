@@ -60,17 +60,23 @@ int main(int argc, char *argv[]) {
         printf("Flag=%d -- Intersects=%d -- ,x0=%.02f, y0=%0.2f\n",intersections[idx].flag, intersections[idx].intersects, intersections[idx].x, intersections[idx].y);
     }
 
-
     IntersectionPoint *centroids;//[interCount];
-    if (interCount>0){
+    //if (interCount>0){
         centroids = (IntersectionPoint *)malloc(interCount * sizeof(IntersectionPoint));
         fillCentroids(intersections,interCount, centroids, interCount );
-    }
+   // }
 
     printf("------------------------->>>>  centroids in Event:  <<<<<<<<<<<<<<<<<-----------------\n");
     for (int idx=0 ; idx< interCount;  idx++){
+        if ( centroids[idx].flag>0)
         printf("Flag=%d -- 3 Lines Different colors=%d -- ,x0=%.02f, y0=%0.2f\n",centroids[idx].flag, centroids[idx].intersects, centroids[idx].x, centroids[idx].y);
     }
+
+    printf("============================================================\n");
+    //IntersectionPoint *centroidsTest;//[interCount];
+    //centroidsTest = (IntersectionPoint *)malloc(interCount * sizeof(IntersectionPoint));
+    //assign_clusters(intersections,interCount,centroidsTest,interCount);
+
 
     free(ylines);
     free(rlines);
