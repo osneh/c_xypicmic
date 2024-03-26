@@ -29,9 +29,6 @@ void printIntersectionPoint0(IntersectionPoint *item) {
     printIntersectionPoint(item, numIP);
 }
 
-
-
-
 void replaceBackslashes(char *str) {
     while (*str) {
         if (*str == '\\') *str = '/';
@@ -206,10 +203,7 @@ void fillCentroids(IntersectionPoint *myIntersections, int myDimIntersections,In
         }
     }
 
-    //free(myclustered);
 }
-
-
 
 
 void assign_clusters(IntersectionPoint *myIntersections, int myDimIntersections, IntersectionPoint * arrayCentroid, int nCentroid ){

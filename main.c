@@ -72,17 +72,12 @@ int main(int argc, char *argv[]) {
         printf("Flag=%d -- 3 Lines Different colors=%d -- ,x0=%.02f, y0=%0.2f\n",centroids[idx].flag, centroids[idx].intersects, centroids[idx].x, centroids[idx].y);
     }
 
-<<<<<<< HEAD
     printf("============================================================\n");
     //IntersectionPoint *centroidsTest;//[interCount];
     //centroidsTest = (IntersectionPoint *)malloc(interCount * sizeof(IntersectionPoint));
     //assign_clusters(intersections,interCount,centroidsTest,interCount);
-
-=======
-    printIntersectionPoint0(centroids); //<== default printall marche pas
-    printIntersectionPoint(centroids,interCount);
-    //    printIntersectionPoint(centroids,10);
->>>>>>> b93b19e3ba2de48c79c4c5b8be3e397a0eba27a7
+    //printIntersectionPoint0(centroids); //<== default printall marche pas
+    //printIntersectionPoint(centroids,interCount);
 
     free(ylines);
     free(rlines);
