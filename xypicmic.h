@@ -29,6 +29,7 @@ typedef struct {
     double y;
     bool intersects;
     unsigned long flag;
+    int num;
 } IntersectionPoint;
 
 void replaceBackslashes(char *str);

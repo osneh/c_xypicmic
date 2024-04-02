@@ -103,12 +103,14 @@ IntersectionPoint calculateIntersection(LineCoordinates line1, LineCoordinates l
 }
 
 IntersectionPoint calculateCentroid(IntersectionPoint *cluster, int size) {
-    IntersectionPoint centroid = {0, 0, false, 1};
+    IntersectionPoint centroid = {0, 0, false, 1,-1};
     
     for (int i = 0; i < size; i++) {
         centroid.x += cluster[i].x;
         centroid.y += cluster[i].y;
         centroid.flag *= cluster[i].flag;
+
+        centroid.num *=cluster[i].num;
 
         //printf("index=%d, flag=%lu\n",i,centroid.flag);
     }
@@ -180,7 +182,9 @@ void fillCentroids(IntersectionPoint *myIntersections, int myDimIntersections,In
             IntersectionPoint cluster[myDimIntersections];      // Tableau temporaire pour stocker un cluster de points.
             numeroCluster++;
             int clusterSize = 0;                                // Taille du cluster.
-            cluster[clusterSize++] = myIntersections[i];        // Ajout du point initial au cluster.
+            //cluster[clusterSize++] = myIntersections[i];        // Ajout du point initial au cluster.
+            cluster[clusterSize] = myIntersections[i]; 
+            cluster[clusterSize++].num = numeroCluster;
             myclustered[i] = 1;                                 // Marquage du point comme regroupé.
             // Recherche d'autres points à inclure dans le cluster.
             for (int j = i + 1; j < myDimIntersections; j++) {
@@ -188,7 +192,9 @@ void fillCentroids(IntersectionPoint *myIntersections, int myDimIntersections,In
                     //double dist = distance(myIntersections[i].x, myIntersections[i].y, myIntersections[j].x, myIntersections[j].y);
                     double dist = distance(cluster[i].x, cluster[i].y, myIntersections[j].x, myIntersections[j].y);
                     if (dist <  THRESHOLD) {
-                        cluster[clusterSize++] = myIntersections[j]; // Ajout du point au cluster.
+                        //cluster[clusterSize++] = myIntersections[j]; // Ajout du point au cluster.
+                        cluster[clusterSize] = myIntersections[j]; // Ajout du point au cluster.
+                        cluster[clusterSize++].num = numeroCluster;
                         myclustered[j] = 1;                           // Marquage du point comme regroupé.
                         //myclustered[j] = numeroCluster;
                     }

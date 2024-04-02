@@ -40,8 +40,9 @@ int main(int argc, char *argv[]) {
 
     //  prinout all lines in event :
     printf("------------------------->>>>  Lines in Event:  <<<<<<<<<<<<<<<<<-----------------\n");
+    printf("track;pt0;pt1\n");
     for (int idx=0 ; idx< numElements;  idx++){
-        printf("%c%d,x0=%.02f, y0=%0.2f, x1=%0.2f, y1=%0.2f\n",lineInEvent[idx].type,lineInEvent[idx].val , lineInEvent[idx].x_start, lineInEvent[idx].y_start, lineInEvent[idx].x_end, lineInEvent[idx].y_end);
+        printf("%c%d;(%.02f, %0.2f); (%0.2f, %0.2f)\n",lineInEvent[idx].type,lineInEvent[idx].val , lineInEvent[idx].x_start, lineInEvent[idx].y_start, lineInEvent[idx].x_end, lineInEvent[idx].y_end);
     }
 
     // -----------------------------------------------------------------
@@ -69,7 +70,7 @@ int main(int argc, char *argv[]) {
     printf("------------------------->>>>  centroids in Event:  <<<<<<<<<<<<<<<<<-----------------\n");
     for (int idx=0 ; idx< interCount;  idx++){
         if ( centroids[idx].flag>0)
-        printf("Flag=%d -- 3 Lines Different colors=%d -- ,x0=%.02f, y0=%0.2f\n",centroids[idx].flag, centroids[idx].intersects, centroids[idx].x, centroids[idx].y);
+        printf(" << ClusNum=%d, Flag=%d -- 3 Lines Different colors=%d -- ,x0=%.02f, y0=%0.2f>>\n",centroids[idx].num,centroids[idx].flag, centroids[idx].intersects, centroids[idx].x, centroids[idx].y);
     }
 
     printf("============================================================\n");
