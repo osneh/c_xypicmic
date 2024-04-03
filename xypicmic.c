@@ -110,10 +110,12 @@ IntersectionPoint calculateCentroid(IntersectionPoint *cluster, int size) {
         centroid.y += cluster[i].y;
         centroid.flag *= cluster[i].flag;
 
-        centroid.num *=cluster[i].num;
+        centroid.num =cluster[i].num;
 
-        //printf("index=%d, flag=%lu\n",i,centroid.flag);
+        //printf("index=%d, cluster numero =%d, flag=%lu\n",i,centroid.num,centroid.flag);
     }
+
+    
 
     //if ( (centroid.flag%11  == 0) &&  (centroid.flag%7 == 0) && (centroid.flag%3  == 0 ) ){
     if ( centroid.flag%105 == 0 ){
@@ -151,7 +153,7 @@ void xLines(IntersectionPoint *intersecs, int nIntersecs,LineCoordinates *yellow
                 for (int jdx = 0 ; jdx<r_size; jdx++){          // Red lines Loop 
                     IntersectionPoint intersection = calculateIntersection(yellow[idx],red[jdx]);
                     intersecs[iCount++] = intersection;
-                    printf("%c%d-%c%d;  xy(%0.2f,%0.2f); flag=%d\n",yellow[idx].type,yellow[idx].val,red[jdx].type,red[jdx].val,intersection.x,intersection.y,intersection.flag );
+                    //printf("%c%d-%c%d;  xy(%0.2f,%0.2f); flag=%d\n",yellow[idx].type,yellow[idx].val,red[jdx].type,red[jdx].val,intersection.x,intersection.y,intersection.flag );
                 }
 
                 for (int kdx = 0 ; kdx<b_size; kdx++){          // Blue lines Loop 
@@ -174,15 +176,18 @@ void xLines(IntersectionPoint *intersecs, int nIntersecs,LineCoordinates *yellow
 
 void fillCentroids(int cut, IntersectionPoint *myIntersections, int myDimIntersections,IntersectionPoint * arrayCentroid, int nCentroid ){
 
-    int myclustered[myDimIntersections];
-    memset(myclustered,0,myDimIntersections*sizeof(int));
-    unsigned int fillCounter = 0;
+    int max_interactions = myDimIntersections -1;
+    int myclustered[max_interactions];
+    memset(myclustered,0,max_interactions*sizeof(int));
+    int fillCounter = -1;
 
-    for (int i = 0; i < myDimIntersections-1; i++) { //printf("HERE12\n");
-        int numeroCluster = -1;
+    for (int i = 0; i < myDimIntersections-1; i++) { 
+        int numeroCluster = fillCounter;
+        //fillCounter++;
         if (!myclustered[i]) {
             IntersectionPoint cluster[myDimIntersections];      // Tableau temporaire pour stocker un cluster de points.
             numeroCluster++;
+            //fillCounter++;
             int clusterSize = 0;                                // Taille du cluster.
             //cluster[clusterSize++] = myIntersections[i];        // Ajout du point initial au cluster.
             cluster[clusterSize] = myIntersections[i]; 
@@ -193,21 +198,26 @@ void fillCentroids(int cut, IntersectionPoint *myIntersections, int myDimInterse
                 if (!myclustered[j]) {
                     double dist = distance(myIntersections[i].x, myIntersections[i].y, myIntersections[j].x, myIntersections[j].y);
                     //double dist = distance(cluster[i].x, cluster[i].y, myIntersections[j].x, myIntersections[j].y);
-                    printf("dist=%0.2f\n",dist);
+                    //printf("dist=%0.2f\n",dist);
                     if (dist <  cut) {
                         //cluster[clusterSize++] = myIntersections[j]; // Ajout du point au cluster.
                         cluster[clusterSize] = myIntersections[j]; // Ajout du point au cluster.
                         cluster[clusterSize++].num = numeroCluster;
+                        //cluster[clusterSize++].num = fillCounter; 
                         myclustered[j] = 1;                           // Marquage du point comme regroupé.
                         //myclustered[j] = numeroCluster;
+                        //printf("----->>>> numero Cluster ==%d\n",numeroCluster);
                     }
                 }
             }
             IntersectionPoint centroid = calculateCentroid(cluster, clusterSize);
-            printf("INSIDE Centroid --> x=%0.2f ,\t y=%0.2f \t fillCounterValue=%d\n",centroid.x,centroid.y,fillCounter);
-            if (centroid.flag!=0){
-	    	arrayCentroid[fillCounter++] = centroid;
-	    }
+            fillCounter++;
+            //printf("INSIDE Centroid --> x=%0.2f ,\t y=%0.2f \t , flag=%d, is3Colors=%d, fillCounterValue=%d ,  numClusters=%d\n",centroid.x,centroid.y,centroid.flag,centroid.intersects,fillCounter,centroid.num);
+            
+            if (fillCounter>-1){
+            
+	    	arrayCentroid[fillCounter] = centroid;
+	        }
             
         }
     }
@@ -261,7 +271,7 @@ void assign_clusters(int cut, IntersectionPoint *myIntersections, int myDimInter
             }
 
             clusIndx[i] = cluster_index;
-            printf("pt[%d]; clustered =%d; clusterIndx =%d \n",i,myclustered[i],cluster_index);
+            //printf("pt[%d]; clustered =%d; clusterIndx =%d \n",i,myclustered[i],cluster_index);
 
             IntersectionPoint centroid = calculateCentroid(cluster, clusterSize);
             //printf("INSIDE Centroid --> x=%0.2f ,\t y=%0.2f \t  \t 3-Ways-3Colors=%d, ClusterSize=%d \n",centroid.x,centroid.y,centroid.intersects,clusterSize);
@@ -271,7 +281,7 @@ void assign_clusters(int cut, IntersectionPoint *myIntersections, int myDimInter
             //myclustered[i]=clusters_index;
         }
     }
-    printf("###############################################\n");
+    //printf("###############################################\n");
     //  printf("#Clusters=%d\n",numeroCluster);
 
 }
@@ -344,6 +354,29 @@ int colorFlag(char color1, char color2){
     else
         return -1; // Indicates invalid combination
 
+}
+
+void remove_element(IntersectionPoint *array, int *size, int index) {
+    if (index < 0 || index >= *size) {
+        printf("Invalid index!\n");
+        return;
+    }
+
+    int vector_index[*size];
+    memset(vector_index,0,*size*sizeof(int));
+
+    //for (int k=0; k<*size;k++){
+    //    if ( array[k].num < 0 )
+    //        vector_index[k] = -1;
+    //}
+    
+    // Shift elements after the removed element
+    for (int i = index; i < *size - 1; i++) {
+        array[i] = array[i + 1];
+    }
+
+    // Decrease the size of the array
+    (*size)--;
 }
 
 char arr[ROWS][COLS][MAX_NAME_LENGTH]= {

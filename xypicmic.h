@@ -46,5 +46,6 @@ int assign_number(char);
 void assign_clusters(int, IntersectionPoint *, int , IntersectionPoint * , int  );
 void printIntersectionPoint(IntersectionPoint *item, int numIP);
 void printIntersectionPoint0(IntersectionPoint *item);
+void remove_element(IntersectionPoint *, int *, int ); 
 
 #endif /* XYPICMIC_H */

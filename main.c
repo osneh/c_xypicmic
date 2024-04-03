@@ -39,12 +39,38 @@ int main(int argc, char *argv[]) {
     
     splitLineColor(lineInEvent,numElements,ylines,rlines,blines);
 
-    //  prinout all lines in event :
-    printf("------------------------->>>>  Lines in Event:  <<<<<<<<<<<<<<<<<-----------------\n");
-    printf("track;pt0;pt1\n");
-    for (int idx=0 ; idx< numElements;  idx++){
-        printf("%c%d;(%.02f, %0.2f); (%0.2f, %0.2f)\n",lineInEvent[idx].type,lineInEvent[idx].val , lineInEvent[idx].x_start, lineInEvent[idx].y_start, lineInEvent[idx].x_end, lineInEvent[idx].y_end);
+    //  printout all lines in event :
+    char filename[]="xlines.csv";
+    FILE *csvFile = fopen(filename, "w");
+        if (csvFile == NULL) {
+            perror("Error opening CSV file");
+            return -1;
+        }
+
+    char filename1[]="inter.csv";
+    FILE *csvFile1 = fopen(filename1, "w");
+    if (csvFile1 == NULL) {
+        perror("Error opening CSV file");
+        return -1;
     }
+
+    char filename2[]="centroid.csv";
+    FILE *csvFile2 = fopen(filename2, "w");
+    if (csvFile1 == NULL) {
+        perror("Error opening CSV file");
+        return -1;
+    }
+
+     //filename[] = "xlines.csv\0";
+    //strftime(filename, sizeof(filename), "xlines.csv");
+
+    printf("------------------------->>>>  Lines in Event:  <<<<<<<<<<<<<<<<<-----------------\n");
+    //printf("track;pt0;pt1\n");
+    fprintf(csvFile, "track;pt0;pt1\n"); 
+    for (int idx=0 ; idx< numElements;  idx++){
+        fprintf(csvFile,"%c%d;(%.02f, %0.2f); (%0.2f, %0.2f)\n",lineInEvent[idx].type,lineInEvent[idx].val , lineInEvent[idx].x_start, lineInEvent[idx].y_start, lineInEvent[idx].x_end, lineInEvent[idx].y_end);
+    }
+    fclose(csvFile);
 
     // -----------------------------------------------------------------
     // compute intersections, centroids and keep these in an array
@@ -58,25 +84,46 @@ int main(int argc, char *argv[]) {
     }
 
     printf("------------------------->>>>  Intersections in Event:  <<<<<<<<<<<<<<<<<-----------------\n");
+
+    fprintf(csvFile1, "x;y\n"); 
     for (int idx=0 ; idx< interCount;  idx++){
-        printf("Flag=%d -- Intersects=%d -- ,x0=%.02f, y0=%0.2f\n",intersections[idx].flag, intersections[idx].intersects, intersections[idx].x, intersections[idx].y);
+        //printf("%d -- ,x0=%.02f, y0=%0.2f\n", intersections[idx].intersects, intersections[idx].x, intersections[idx].y);
+        fprintf(csvFile1,"%.04f;%0.4f\n", intersections[idx].x, intersections[idx].y); 
     }
+    fclose(csvFile1);
 
     IntersectionPoint *centroids;//[interCount];
     //if (interCount>0){
         centroids = (IntersectionPoint *)malloc(interCount * sizeof(IntersectionPoint));
+        
+        for ( int i=0;  i < interCount; i++) {
+            centroids[i].x = 0;
+            centroids[i].y = 0;
+            centroids[i].intersects= false;
+            centroids[i].flag= 1; 
+            centroids[i].num = -1 ;
+        }
+
         fillCentroids(threshold, intersections,interCount, centroids, interCount );
    // }
 
     printf("------------------------->>>>  centroids in Event:  <<<<<<<<<<<<<<<<<-----------------\n");
+
+    //fprintf(csvFile2, "x;y\n"); 
+
+
+
+
+
+
     for (int idx=0 ; idx< interCount;  idx++){
         if ( centroids[idx].flag>0)
         printf(" << ClusNum=%d, Flag=%d -- 3 Lines Different colors=%d -- ,x0=%.02f, y0=%0.2f>>\n",centroids[idx].num,centroids[idx].flag, centroids[idx].intersects, centroids[idx].x, centroids[idx].y);
     }
 
-    printf("============================================================\n");
-    printf("============================================================\n");
-    printf("============================================================\n");
+    //printf("============================================================\n");
+    //printf("============================================================\n");
+    //printf("============================================================\n");
     //IntersectionPoint *centroidsTest;//[interCount];
     //centroidsTest = (IntersectionPoint *)malloc(interCount * sizeof(IntersectionPoint));
     //assign_clusters(threshold, intersections,interCount,centroidsTest,interCount);
