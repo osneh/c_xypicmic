@@ -331,9 +331,9 @@ int assign_number(char c) {
     switch(c) {
         case 'Y':
             return 0;
-        case 'B':
-            return 1;
         case 'R':
+            return 1;
+        case 'B':
             return 2;
         default:
             return -1; // Indicates invalid character
@@ -364,11 +364,6 @@ void remove_element(IntersectionPoint *array, int *size, int index) {
 
     int vector_index[*size];
     memset(vector_index,0,*size*sizeof(int));
-
-    //for (int k=0; k<*size;k++){
-    //    if ( array[k].num < 0 )
-    //        vector_index[k] = -1;
-    //}
     
     // Shift elements after the removed element
     for (int i = index; i < *size - 1; i++) {
