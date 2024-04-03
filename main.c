@@ -74,9 +74,11 @@ int main(int argc, char *argv[]) {
     }
 
     printf("============================================================\n");
-    //IntersectionPoint *centroidsTest;//[interCount];
-    //centroidsTest = (IntersectionPoint *)malloc(interCount * sizeof(IntersectionPoint));
-    //assign_clusters(intersections,interCount,centroidsTest,interCount);
+    printf("============================================================\n");
+    printf("============================================================\n");
+    IntersectionPoint *centroidsTest;//[interCount];
+    centroidsTest = (IntersectionPoint *)malloc(interCount * sizeof(IntersectionPoint));
+    assign_clusters(intersections,interCount,centroidsTest,interCount);
     //printIntersectionPoint0(centroids); //<== default printall marche pas
     //printIntersectionPoint(centroids,interCount);
 
