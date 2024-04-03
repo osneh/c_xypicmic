@@ -172,7 +172,7 @@ void xLines(IntersectionPoint *intersecs, int nIntersecs,LineCoordinates *yellow
     *counter=iCount;
 }
 
-void fillCentroids(IntersectionPoint *myIntersections, int myDimIntersections,IntersectionPoint * arrayCentroid, int nCentroid ){
+void fillCentroids(int cut, IntersectionPoint *myIntersections, int myDimIntersections,IntersectionPoint * arrayCentroid, int nCentroid ){
 
     int myclustered[myDimIntersections];
     memset(myclustered,0,myDimIntersections*sizeof(int));
@@ -194,7 +194,7 @@ void fillCentroids(IntersectionPoint *myIntersections, int myDimIntersections,In
                     double dist = distance(myIntersections[i].x, myIntersections[i].y, myIntersections[j].x, myIntersections[j].y);
                     //double dist = distance(cluster[i].x, cluster[i].y, myIntersections[j].x, myIntersections[j].y);
                     printf("dist=%0.2f\n",dist);
-                    if (dist <  THRESHOLD) {
+                    if (dist <  cut) {
                         //cluster[clusterSize++] = myIntersections[j]; // Ajout du point au cluster.
                         cluster[clusterSize] = myIntersections[j]; // Ajout du point au cluster.
                         cluster[clusterSize++].num = numeroCluster;
@@ -215,7 +215,7 @@ void fillCentroids(IntersectionPoint *myIntersections, int myDimIntersections,In
 }
 
 
-void assign_clusters(IntersectionPoint *myIntersections, int myDimIntersections, IntersectionPoint * arrayCentroid, int nCentroid ){
+void assign_clusters(int cut, IntersectionPoint *myIntersections, int myDimIntersections, IntersectionPoint * arrayCentroid, int nCentroid ){
 
     int myclustered[myDimIntersections];
     memset(myclustered,0,myDimIntersections*sizeof(int));
@@ -249,7 +249,7 @@ void assign_clusters(IntersectionPoint *myIntersections, int myDimIntersections,
                     double dist = distance(myIntersections[i].x, myIntersections[i].y, myIntersections[j].x, myIntersections[j].y);
                     //double dist = distance(cluster[i].x, cluster[i].y, myIntersections[j].x, myIntersections[j].y);
                     //if (dist <  THRESHOLD && dist < min_dist) {
-                    if (dist <  THRESHOLD && dist < min_dist) {
+                    if (dist <  cut && dist < min_dist) {
                         cluster[clusterSize++] = myIntersections[j]; // Ajout du point au cluster.
                         myclustered[j] = 1;                           // Marquage du point comme regroupé.
                         cluster_index = j;
@@ -287,8 +287,8 @@ void fillLines(char *arguments[], LineCoordinates *allLines, int nLines, int *ye
      int temp_y= 0; int temp_r=0; int temp_b=0; 
 
      for (int i = 0; i < nLines; i++) {
-     int inputRow = atoi(arguments[2 + i * 2]); 
-     int inputCol = atoi(arguments[3 + i * 2]); 
+        int inputRow = atoi(arguments[3 + i * 2]); 
+        int inputCol = atoi(arguments[4 + i * 2]); 
         if (inputRow >= 0 && inputRow < ROWS && inputCol >= 0 && inputCol < COLS) {
             char *value = arr[inputRow][inputCol];
             char lineType = value[0]; 

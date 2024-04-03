@@ -15,12 +15,13 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    int numElements = atoi(argv[1]);
-    if (numElements < 1 || argc != 2 + numElements * 2) {
+    int threshold = atoi(argv[1]);
+    int numElements = atoi(argv[2]);
+    if (numElements < 1 || argc !=3 + numElements * 2) {
         printf("Invalid number of arguments. Please provide the correct number of row and column pairs.\n");
         return 1;
     }
-      
+    
     // ----------------------------------------------------------------  
     // fill array of lines per Event and count lines by color  
     // ----------------------------------------------------------------  
@@ -64,7 +65,7 @@ int main(int argc, char *argv[]) {
     IntersectionPoint *centroids;//[interCount];
     //if (interCount>0){
         centroids = (IntersectionPoint *)malloc(interCount * sizeof(IntersectionPoint));
-        fillCentroids(intersections,interCount, centroids, interCount );
+        fillCentroids(threshold, intersections,interCount, centroids, interCount );
    // }
 
     printf("------------------------->>>>  centroids in Event:  <<<<<<<<<<<<<<<<<-----------------\n");
@@ -76,9 +77,9 @@ int main(int argc, char *argv[]) {
     printf("============================================================\n");
     printf("============================================================\n");
     printf("============================================================\n");
-    IntersectionPoint *centroidsTest;//[interCount];
-    centroidsTest = (IntersectionPoint *)malloc(interCount * sizeof(IntersectionPoint));
-    assign_clusters(intersections,interCount,centroidsTest,interCount);
+    //IntersectionPoint *centroidsTest;//[interCount];
+    //centroidsTest = (IntersectionPoint *)malloc(interCount * sizeof(IntersectionPoint));
+    //assign_clusters(threshold, intersections,interCount,centroidsTest,interCount);
     //printIntersectionPoint0(centroids); //<== default printall marche pas
     //printIntersectionPoint(centroids,interCount);
 
