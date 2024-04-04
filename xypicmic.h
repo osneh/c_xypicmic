@@ -43,7 +43,6 @@ void fillCentroids(int, IntersectionPoint *, int , IntersectionPoint * , int  );
 void fillLines(char * [],LineCoordinates *, int, int *, int *, int *);
 int colorFlag(char, char);
 int assign_number(char);
-void assign_clusters(int, IntersectionPoint *, int , IntersectionPoint * , int  );
 void printIntersectionPoint(IntersectionPoint *item, int numIP);
 void printIntersectionPoint0(IntersectionPoint *item);
 void remove_element(IntersectionPoint *, int *, int ); 

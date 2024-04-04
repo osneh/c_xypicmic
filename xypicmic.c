@@ -147,7 +147,7 @@ void splitLineColor(LineCoordinates *Items, int nItems, LineCoordinates *ly, Lin
 
 void xLines(IntersectionPoint *intersecs, int nIntersecs,LineCoordinates *yellow, int y_size, LineCoordinates *red, int r_size, LineCoordinates * blue, int b_size, int * counter){
         int iCount =0;
-        printf("----------------------------------\n");
+        //printf("----------------------------------\n");
         if (y_size>0){
             for (int idx = 0 ; idx<y_size; idx++){              // Yellow lines Loop
                 for (int jdx = 0 ; jdx<r_size; jdx++){          // Red lines Loop 
@@ -187,9 +187,7 @@ void fillCentroids(int cut, IntersectionPoint *myIntersections, int myDimInterse
         if (!myclustered[i]) {
             IntersectionPoint cluster[myDimIntersections];      // Tableau temporaire pour stocker un cluster de points.
             numeroCluster++;
-            //fillCounter++;
             int clusterSize = 0;                                // Taille du cluster.
-            //cluster[clusterSize++] = myIntersections[i];        // Ajout du point initial au cluster.
             cluster[clusterSize] = myIntersections[i]; 
             cluster[clusterSize++].num = numeroCluster;
             myclustered[i] = 1;                                 // Marquage du point comme regroupé.
@@ -197,16 +195,10 @@ void fillCentroids(int cut, IntersectionPoint *myIntersections, int myDimInterse
             for (int j = i + 1; j < myDimIntersections; j++) {
                 if (!myclustered[j]) {
                     double dist = distance(myIntersections[i].x, myIntersections[i].y, myIntersections[j].x, myIntersections[j].y);
-                    //double dist = distance(cluster[i].x, cluster[i].y, myIntersections[j].x, myIntersections[j].y);
-                    //printf("dist=%0.2f\n",dist);
                     if (dist <  cut) {
-                        //cluster[clusterSize++] = myIntersections[j]; // Ajout du point au cluster.
                         cluster[clusterSize] = myIntersections[j]; // Ajout du point au cluster.
                         cluster[clusterSize++].num = numeroCluster;
-                        //cluster[clusterSize++].num = fillCounter; 
                         myclustered[j] = 1;                           // Marquage du point comme regroupé.
-                        //myclustered[j] = numeroCluster;
-                        //printf("----->>>> numero Cluster ==%d\n",numeroCluster);
                     }
                 }
             }
@@ -215,7 +207,6 @@ void fillCentroids(int cut, IntersectionPoint *myIntersections, int myDimInterse
             //printf("INSIDE Centroid --> x=%0.2f ,\t y=%0.2f \t , flag=%d, is3Colors=%d, fillCounterValue=%d ,  numClusters=%d\n",centroid.x,centroid.y,centroid.flag,centroid.intersects,fillCounter,centroid.num);
             
             if (fillCounter>-1){
-            
 	    	arrayCentroid[fillCounter] = centroid;
 	        }
             
@@ -223,75 +214,6 @@ void fillCentroids(int cut, IntersectionPoint *myIntersections, int myDimInterse
     }
 
 }
-
-
-void assign_clusters(int cut, IntersectionPoint *myIntersections, int myDimIntersections, IntersectionPoint * arrayCentroid, int nCentroid ){
-
-    int myclustered[myDimIntersections];
-    memset(myclustered,0,myDimIntersections*sizeof(int));
-
-    int clusIndx[myDimIntersections];
-    //memset();
-    memset(clusIndx,0,myDimIntersections*sizeof(int));
-    //int clusters_index[myDimIntersections];
-    //memset(clusters_index,-1,myDimIntersections*sizeof(int));
-    unsigned int fillCounter = 0;
-    unsigned int cont =0;
-
-
-    //int numeroCluster = -1;
-    //IntersectionPoint cluster
-    //int cluster_index=-1;
-    for (int i = 0; i < myDimIntersections-1; i++) { //printf("HERE12\n");
-        double min_dist = INFINITY;
-        int cluster_index = -1;
-        if (!myclustered[i]) {
-            IntersectionPoint cluster[myDimIntersections];      // Tableau temporaire pour stocker un cluster de points.
-            cluster_index++;
-            int clusterSize = 0;                                // Taille du cluster.
-            cluster[clusterSize++] = myIntersections[i];        // Ajout du point initial au cluster.
-            myclustered[i] = 1;                                 // Marquage du point comme regroupé.
-            //printf("@@@@ \t Cluster Number=%d\n",cluster_index);
-            // Recherche d'autres points à inclure dans le cluster.
-            for (int j = i + 1; j < myDimIntersections; j++) {
-                if (!myclustered[j]) {
-                    //printf("HERE:%d \n",cont++);
-                    double dist = distance(myIntersections[i].x, myIntersections[i].y, myIntersections[j].x, myIntersections[j].y);
-                    //double dist = distance(cluster[i].x, cluster[i].y, myIntersections[j].x, myIntersections[j].y);
-                    //if (dist <  THRESHOLD && dist < min_dist) {
-                    if (dist <  cut && dist < min_dist) {
-                        cluster[clusterSize++] = myIntersections[j]; // Ajout du point au cluster.
-                        myclustered[j] = 1;                           // Marquage du point comme regroupé.
-                        cluster_index = j;
-                        min_dist = dist;
-
-                        //numeroCluster
-                    }
-                }
-            }
-
-            clusIndx[i] = cluster_index;
-            //printf("pt[%d]; clustered =%d; clusterIndx =%d \n",i,myclustered[i],cluster_index);
-
-            IntersectionPoint centroid = calculateCentroid(cluster, clusterSize);
-            //printf("INSIDE Centroid --> x=%0.2f ,\t y=%0.2f \t  \t 3-Ways-3Colors=%d, ClusterSize=%d \n",centroid.x,centroid.y,centroid.intersects,clusterSize);
-            if (centroid.flag!=0){
-	    	    arrayCentroid[fillCounter++] = centroid;
-            }
-            //myclustered[i]=clusters_index;
-        }
-    }
-    //printf("###############################################\n");
-    //  printf("#Clusters=%d\n",numeroCluster);
-
-}
-
-//free(myclustered);
-//}
-
-
-
-
 
 void fillLines(char *arguments[], LineCoordinates *allLines, int nLines, int *yellowSize , int *redSize, int * blueSize){
      int temp_y= 0; int temp_r=0; int temp_b=0; 
