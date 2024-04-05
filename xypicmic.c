@@ -103,22 +103,18 @@ IntersectionPoint calculateIntersection(LineCoordinates line1, LineCoordinates l
 }
 
 IntersectionPoint calculateCentroid(IntersectionPoint *cluster, int size) {
-    IntersectionPoint centroid = {0, 0, false, 1,-1};
-    
+    IntersectionPoint centroid = {0, 0, false, 0,-1};
+    unsigned char results=0;
     for (int i = 0; i < size; i++) {
         centroid.x += cluster[i].x;
         centroid.y += cluster[i].y;
-        centroid.flag *= cluster[i].flag;
-
+        results = fill_bits(results,cluster[i].flag);
         centroid.num =cluster[i].num;
-
-        //printf("index=%d, cluster numero =%d, flag=%lu\n",i,centroid.num,centroid.flag);
     }
+    centroid.flag = results;
 
-    
 
-    //if ( (centroid.flag%11  == 0) &&  (centroid.flag%7 == 0) && (centroid.flag%3  == 0 ) ){
-    if ( centroid.flag%105 == 0 ){
+    if ( centroid.flag== 7 ){
         centroid.intersects = true;
     }
 
@@ -130,7 +126,7 @@ IntersectionPoint calculateCentroid(IntersectionPoint *cluster, int size) {
         centroid.x = INFINITY;
         centroid.y = INFINITY;
     }
-    
+
     return centroid;
 }
 
@@ -278,22 +274,28 @@ int colorFlag(char color1, char color2){
 
 }
 
-void remove_element(IntersectionPoint *array, int *size, int index) {
-    if (index < 0 || index >= *size) {
-        printf("Invalid index!\n");
-        return;
+void init_array(IntersectionPoint *array, int dim){
+    for (int k = 0 ; k < dim; k++){
+        array[k].x = 0;
+        array[k].y = 0;
+        array[k].intersects= false;
+        array[k].flag= 0; 
+        array[k].num = -1 ;
     }
+}
 
-    int vector_index[*size];
-    memset(vector_index,0,*size*sizeof(int));
-    
-    // Shift elements after the removed element
-    for (int i = index; i < *size - 1; i++) {
-        array[i] = array[i + 1];
+unsigned char fill_bits(unsigned char byte, int num) {
+    // Set bit 0, 1, and 2 based on the provided number
+    if (num == COMBINATION_YR) {
+        byte |= (1 << 0);
     }
-
-    // Decrease the size of the array
-    (*size)--;
+    if (num == COMBINATION_YB) {
+        byte |= (1 << 1);
+    }
+    if (num == COMBINATION_RB) {
+        byte |= (1 << 2);
+    }
+    return byte;
 }
 
 char arr[ROWS][COLS][MAX_NAME_LENGTH]= {

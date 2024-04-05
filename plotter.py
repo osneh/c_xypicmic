@@ -34,7 +34,7 @@ for kdx in range(df_clus.index.stop):
     cy = df_clus.y[kdx]
     #ll = '('+str(cy)+','+str(cy)+')'
     ll = str(cy)+','+str(cy)
-    plt.scatter(cx,cy,facecolors='none',s= 150,color=clist[kdx],label=ll)
+    plt.scatter(cx,cy,facecolors='none',s= 100,color=clist[kdx],label=ll)
 
 plt.ylim(-4000,4000)
 plt.xlim(-4000,5000)
