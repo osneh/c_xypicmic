@@ -2,10 +2,19 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+#from pathlib import Path
+import os
 
 data = pd.read_csv("xlines.csv",delimiter=";")
-df= pd.read_csv("inter.csv", delimiter=";")
-df_clus = pd.read_csv("centroid.csv",delimiter=';')
+
+mypathI= os.path.getsize('inter.csv')
+mypathC= os.path.getsize('centroid.csv')
+
+if (mypathI!=0):
+    df= pd.read_csv("inter.csv", delimiter=";")
+if (mypathC!=0):
+    df_clus = pd.read_csv("centroid.csv",delimiter=';')
+
 
 clist = ['red','pink','purple','blue','cyan','green','olive','orange','brown','black','gray','grey','yellow',
          'silver','tan','navy','lightpink','peru']
@@ -22,19 +31,28 @@ for idx in range(data.index.stop) :
         
     line0 = (eval(data.pt0[idx]),eval(data.pt1[idx]))
     xs,ys = zip(*line0)
-    plt.plot(xs,ys,'--', markersize=0, color=tcolor, linewidth=1.2)
+    plt.plot(xs,ys,'--', markersize=0, color=tcolor, linewidth=.6)
 
-for jdx in range(df.index.stop):
-    px = df.x[jdx]
-    py  = df.y[jdx]
-    #plt.scatter(px,py,20,color='black',marker='o')
-    
-for kdx in range(df_clus.index.stop):
-    cx = df_clus.x[kdx]
-    cy = df_clus.y[kdx]
-    #ll = '('+str(cy)+','+str(cy)+')'
-    ll = str(cy)+','+str(cy)
-    plt.scatter(cx,cy,facecolors='none',s= 100,color=clist[kdx],label=ll)
+if (mypathI!=0):
+    for jdx in range(df.index.stop):
+        px = df.x[jdx]
+        py  = df.y[jdx]
+        plt.scatter(px,py,10,color='black',marker='x')
+
+
+#num_plots=20
+#colormap = plt.cm.gist_ncar
+#plt.gca().set_prop_cycle(plt.cycler('color', plt.cm.jet(np.linspace(0, 1, num_plots))))
+
+
+if (mypathC!=0):
+    colormap = plt.cm.gist_ncar #nipy_spectral, Set1,Paired   
+    colors = [colormap(i) for i in np.linspace(0, 10,500)]
+    for kdx in range(df_clus.index.stop):
+        cx = df_clus.x[kdx]
+        cy = df_clus.y[kdx]
+        ll = str(cx)+','+str(cy)
+        plt.scatter(cx,cy,facecolors='none',s= 100,label=ll,color=colors[kdx])
 
 plt.ylim(-4000,4000)
 plt.xlim(-4000,5000)
@@ -42,7 +60,8 @@ plt.xlabel('X-axis [$\mu$m]')
 plt.ylabel('Y-axis [$\mu$m]')
 plt.title('PICMIC$0$ Intersections, Centroids and Clusters')
 #plt.grid()
-plt.legend( fontsize=9,bbox_to_anchor=(0.5, 0., 0.5, 0.5) )
+if (mypathC!=0):
+    plt.legend( fontsize=9,bbox_to_anchor=(0.5, 0., 0.5, 0.5) )
 #plt.axis('off')
 plt.savefig('plot.png')
 plt.show()

@@ -61,12 +61,12 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    //printf("------------------------->>>>  Lines in Event:  <<<<<<<<<<<<<<<<<-----------------\n");
-    //printf("track;pt0;pt1\n");
+    printf("------------------------->>>>  Lines in Event:  <<<<<<<<<<<<<<<<<-----------------\n");
+    printf("track;pt0;pt1\n");
     fprintf(csvFile, "track;pt0;pt1\n"); 
     for (int idx=0 ; idx< numElements;  idx++){
         fprintf(csvFile,"%c%d;(%.02f, %0.2f); (%0.2f, %0.2f)\n",lineInEvent[idx].type,lineInEvent[idx].val , lineInEvent[idx].x_start, lineInEvent[idx].y_start, lineInEvent[idx].x_end, lineInEvent[idx].y_end);
-        //printf("%c%d;(%.02f, %0.2f); (%0.2f, %0.2f)\n",lineInEvent[idx].type,lineInEvent[idx].val , lineInEvent[idx].x_start, lineInEvent[idx].y_start, lineInEvent[idx].x_end, lineInEvent[idx].y_end);
+        printf("%c%d;(%.02f, %0.2f); (%0.2f, %0.2f)\n",lineInEvent[idx].type,lineInEvent[idx].val , lineInEvent[idx].x_start, lineInEvent[idx].y_start, lineInEvent[idx].x_end, lineInEvent[idx].y_end);
     }
     fclose(csvFile);
 
@@ -80,25 +80,43 @@ int main(int argc, char *argv[]) {
         intersections = (IntersectionPoint *)malloc(combinations * sizeof(IntersectionPoint));
         xLines(intersections,combinations,ylines,y_size,rlines,r_size,blines,b_size,&interCount);
     }
+    else {
+    	printf("NOT COMBINATIONS \n");
+	return 1;
+    }
 
+    printf("------------------------->>>>  Intersections:  <<<<<<<<<<<<<<<<<-----------------\n");
+    printf("intercoutn=%d\n",interCount);
     fprintf(csvFile1, "x;y\n"); 
     for (int idx=0 ; idx< interCount;  idx++){
-        //printf("indx=%d, intersects:%d -- ,x0=%.02f, y0=%0.2f\n", idx,intersections[idx].intersects, intersections[idx].x, intersections[idx].y);
+        printf("indx=%d, intersects:%d -- ,x0=%.02f, y0=%0.2f\n", idx,intersections[idx].intersects, intersections[idx].x, intersections[idx].y);
         fprintf(csvFile1,"%.04f;%0.4f\n", intersections[idx].x, intersections[idx].y); 
     }
     fclose(csvFile1);
 
-    IntersectionPoint *centroids;//[interCount];
-    //if (interCount>0){
-    centroids = (IntersectionPoint *)malloc(interCount * sizeof(IntersectionPoint));
-    init_array(centroids,interCount);    
-    fillCentroids(threshold, intersections,interCount, centroids, interCount );
+    printf("------------------------->>>>  Centroids :  <<<<<<<<<<<<<<<<<-----------------\n");
+    
+    fprintf(csvFile2, "numCluster;centroidFlag; centroid3Colors;x;y\n"); 
+    if (interCount>0){
+    	IntersectionPoint *centroids;//[interCount];
+    	centroids = (IntersectionPoint *)malloc(interCount * sizeof(IntersectionPoint));
+    	init_array(centroids,interCount);    
+    	if (interCount==1) 
+	    centroids[0] = intersections[0];
+    	else  
+    	    fillCentroids(threshold, intersections,interCount, centroids, interCount );
    //}
 
-    fprintf(csvFile2, "numCluster;centroidFlag; centroid3Colors;x;y\n"); 
-    for (int idx=0 ; idx< interCount;  idx++){
-        if ( centroids[idx].num>-1 && centroids[idx].flag == 7 )
-        fprintf(csvFile2,"%d;%d;%d;%.04f;%0.4f\n",centroids[idx].num,centroids[idx].flag, centroids[idx].intersects, centroids[idx].x, centroids[idx].y);
+    	printf("numCluster;centroidFlag; centroid3Colors;x;y\n"); 
+    	//fprintf(csvFile2, "numCluster;centroidFlag; centroid3Colors;x;y\n"); 
+    	for (int idx=0 ; idx< interCount;  idx++){
+        	//if ( centroids[idx].num>-1 /*&& centroids[idx].flag == 7*/ ){
+        	if ( centroids[idx].num>-1  ){
+        		printf("%d;%d;%d;%.04f;%0.4f\n",centroids[idx].num,centroids[idx].flag, centroids[idx].intersects, centroids[idx].x, centroids[idx].y);
+        		fprintf(csvFile2,"%d;%d;%d;%.04f;%0.4f\n",centroids[idx].num,centroids[idx].flag, centroids[idx].intersects, centroids[idx].x, centroids[idx].y);
+	 	}
+	 }
+    	free(centroids);
     }
     fclose(csvFile2);
 
@@ -107,7 +125,6 @@ int main(int argc, char *argv[]) {
     free(blines);
     free(intersections);
     free(lineInEvent);
-    free(centroids);
 
     return 0; 
 }

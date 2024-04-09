@@ -172,7 +172,7 @@ void xLines(IntersectionPoint *intersecs, int nIntersecs,LineCoordinates *yellow
 
 void fillCentroids(int cut, IntersectionPoint *myIntersections, int myDimIntersections,IntersectionPoint * arrayCentroid, int nCentroid ){
 
-    int max_interactions = myDimIntersections -1;
+    int max_interactions = myDimIntersections;
     int myclustered[max_interactions];
     memset(myclustered,0,max_interactions*sizeof(int));
     int fillCounter = -1;
