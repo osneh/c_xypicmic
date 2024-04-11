@@ -4,11 +4,6 @@
 #include <string.h>
 #include <math.h>
 
-//#define ARRAY_LENGTH(arr) (sizeof(arr) / sizeof(arr[0]))
-
-// c++ not C
-//template<typename T, size_t n> char (& array_size(const T (&)[n]) )[n];
-
 void printIntersectionPoint(IntersectionPoint *item, int numIP) {
   //   printf("Printing %d persons:\n", numIP);
     for (int i = 0; i < numIP; ++i) {
@@ -201,7 +196,14 @@ void fillCentroids(int cut, IntersectionPoint *myIntersections, int myDimInterse
             IntersectionPoint centroid = calculateCentroid(cluster, clusterSize);
             fillCounter++;
             //printf("INSIDE Centroid --> x=%0.2f ,\t y=%0.2f \t , flag=%d, is3Colors=%d, fillCounterValue=%d ,  numClusters=%d\n",centroid.x,centroid.y,centroid.flag,centroid.intersects,fillCounter,centroid.num);
-            
+            if (fillCounter>-1){
+                for (int t = 0 ; t<clusterSize; t++ ){
+                    printf("%d;%0.2f;%0.2f \n",fillCounter,cluster[t].x,cluster[t].y);
+                    //fprintf(csvFile3,"%d;%0.2f;%0.2f\n",fillCounter,cluster[t].x,cluster[t].y);
+                }
+            }
+
+
             if (fillCounter>-1){
 	    	arrayCentroid[fillCounter] = centroid;
 	        }
@@ -296,6 +298,21 @@ unsigned char fill_bits(unsigned char byte, int num) {
         byte |= (1 << 2);
     }
     return byte;
+}
+
+
+int selThreshold(int nlines){
+  int selthre = 1500;
+  if (nlines < 15) {
+	  selthre = 100;
+  } else if (nlines>=15 && nlines<20){
+  	selthre = 250;
+  } else if (nlines>=20 && nlines<30){
+  	selthre = 500;
+  } else if(nlines>=30){
+  	selthre = 1500;
+  }
+  return selthre;
 }
 
 char arr[ROWS][COLS][MAX_NAME_LENGTH]= {

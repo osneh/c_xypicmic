@@ -15,7 +15,6 @@ if (mypathI!=0):
 if (mypathC!=0):
     df_clus = pd.read_csv("centroid.csv",delimiter=';')
 
-
 clist = ['red','pink','purple','blue','cyan','green','olive','orange','brown','black','gray','grey','yellow',
          'silver','tan','navy','lightpink','peru']
 for idx in range(data.index.stop) :
@@ -27,28 +26,32 @@ for idx in range(data.index.stop) :
     elif way[0]=='R':
         tcolor='red'
     elif way[0]=='Y':
-        tcolor='yellow'
+        tcolor='gold'
         
     line0 = (eval(data.pt0[idx]),eval(data.pt1[idx]))
     xs,ys = zip(*line0)
-    plt.plot(xs,ys,'--', markersize=0, color=tcolor, linewidth=.6)
+    plt.plot(xs,ys,'--', markersize=0, color=tcolor, linewidth=.3)
 
 if (mypathI!=0):
     for jdx in range(df.index.stop):
         px = df.x[jdx]
         py  = df.y[jdx]
-        plt.scatter(px,py,10,color='black',marker='x')
+        plt.scatter(px,py,2,color='black',marker='x')
 
 
 if (mypathC!=0):
-    ##colormap = plt.cm.gist_ncar #nipy_spectral, Set1,Paired   
-    ##colors = [colormap(i) for i in np.linspace(0, 10,500)]
+    colormap = plt.cm.gist_ncar #nipy_spectral, Set1,Paired   
+    colors = [colormap(i) for i in np.linspace(0, 10,500)]
     for kdx in range(df_clus.index.stop):
-        cx = df_clus.x[kdx]
-        cy = df_clus.y[kdx]
-        ll = str(cx)+','+str(cy)
-        #plt.scatter(cx,cy,facecolors='none',s= 100,label=ll,color=colors[kdx])
-        plt.scatter(cx,cy,facecolors='none',s= 100,label=ll,color='black')
+        flagColor = df_clus.centroidFlag[kdx]
+        if (flagColor==7) :
+            cx = df_clus.x[kdx]
+            cy = df_clus.y[kdx]
+            ll = str(cx)+','+str(cy)
+            #plt.scatter(cx,cy,facecolors='none',s= 100,label=ll,color=colors[kdx])
+            #plt.scatter(cx,cy,s= 100,label=ll,color=colors[kdx])
+            plt.scatter(cx,cy,s= 100,label=ll,color='dimgrey')
+            #plt.scatter(cx,cy,facecolors='none',s= 100,label=ll,color='black')
 
 plt.ylim(-4000,4000)
 plt.xlim(-4000,5000)

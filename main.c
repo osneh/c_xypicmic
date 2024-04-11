@@ -15,8 +15,10 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    int threshold = atoi(argv[1]);
+    //int threshold = atoi(argv[1]);
     int numElements = atoi(argv[2]);
+    int threshold = selThreshold(numElements);
+    
     if (numElements < 1 || argc !=3 + numElements * 2) {
         printf("Invalid number of arguments. Please provide the correct number of row and column pairs.\n");
         return 1;
@@ -60,7 +62,6 @@ int main(int argc, char *argv[]) {
         perror("Error opening CSV file");
         return -1;
     }
-
     /*
     char filename3[]="clusters.csv";
     FILE *csvFile3 = fopen(filename3, "w");
@@ -69,6 +70,7 @@ int main(int argc, char *argv[]) {
         return -1;
     }
     */
+    
 
     printf("------------------------->>>>  Lines in Event:  <<<<<<<<<<<<<<<<<-----------------\n");
     printf("track;pt0;pt1\n");
@@ -118,9 +120,10 @@ int main(int argc, char *argv[]) {
 
     	printf("numCluster;centroidFlag; centroid3Colors;x;y\n"); 
     	//fprintf(csvFile2, "numCluster;centroidFlag; centroid3Colors;x;y\n"); 
+        //fprintf(csvFile3,"numCluster;x;y\n");
     	for (int idx=0 ; idx< interCount;  idx++){
-        	//if ( centroids[idx].num>-1 /*&& centroids[idx].flag == 7*/ ){
-        	if ( centroids[idx].num>-1  ){
+        	if ( centroids[idx].num>-1 && centroids[idx].flag == 7 ){
+        	//if ( centroids[idx].num>-1  ){
         		printf("%d;%d;%d;%.04f;%0.4f\n",centroids[idx].num,centroids[idx].flag, centroids[idx].intersects, centroids[idx].x, centroids[idx].y);
         		fprintf(csvFile2,"%d;%d;%d;%.04f;%0.4f\n",centroids[idx].num,centroids[idx].flag, centroids[idx].intersects, centroids[idx].x, centroids[idx].y);
 	 	}
@@ -128,6 +131,7 @@ int main(int argc, char *argv[]) {
     	free(centroids);
     }
     fclose(csvFile2);
+    //fclose(csvFile3);
 
     free(ylines);
     free(rlines);

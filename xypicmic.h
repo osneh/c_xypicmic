@@ -47,6 +47,7 @@ void printIntersectionPoint(IntersectionPoint *item, int numIP);
 void printIntersectionPoint0(IntersectionPoint *item);
 void init_array(IntersectionPoint *, int);
 unsigned char fill_bits(unsigned char, int);
+int selThreshold(int);
 
 
 #endif /* XYPICMIC_H */
