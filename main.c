@@ -56,10 +56,19 @@ int main(int argc, char *argv[]) {
 
     char filename2[]="centroid.csv";
     FILE *csvFile2 = fopen(filename2, "w");
-    if (csvFile1 == NULL) {
+    if (csvFile2 == NULL) {
         perror("Error opening CSV file");
         return -1;
     }
+
+    /*
+    char filename3[]="clusters.csv";
+    FILE *csvFile3 = fopen(filename3, "w");
+    if (csvFile3 == NULL) {
+        perror("Error opening CSV file");
+        return -1;
+    }
+    */
 
     printf("------------------------->>>>  Lines in Event:  <<<<<<<<<<<<<<<<<-----------------\n");
     printf("track;pt0;pt1\n");
@@ -102,7 +111,7 @@ int main(int argc, char *argv[]) {
     	centroids = (IntersectionPoint *)malloc(interCount * sizeof(IntersectionPoint));
     	init_array(centroids,interCount);    
     	if (interCount==1) 
-	    centroids[0] = intersections[0];
+	        centroids[0] = intersections[0];
     	else  
     	    fillCentroids(threshold, intersections,interCount, centroids, interCount );
    //}

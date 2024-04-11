@@ -40,19 +40,15 @@ if (mypathI!=0):
         plt.scatter(px,py,10,color='black',marker='x')
 
 
-#num_plots=20
-#colormap = plt.cm.gist_ncar
-#plt.gca().set_prop_cycle(plt.cycler('color', plt.cm.jet(np.linspace(0, 1, num_plots))))
-
-
 if (mypathC!=0):
-    colormap = plt.cm.gist_ncar #nipy_spectral, Set1,Paired   
-    colors = [colormap(i) for i in np.linspace(0, 10,500)]
+    ##colormap = plt.cm.gist_ncar #nipy_spectral, Set1,Paired   
+    ##colors = [colormap(i) for i in np.linspace(0, 10,500)]
     for kdx in range(df_clus.index.stop):
         cx = df_clus.x[kdx]
         cy = df_clus.y[kdx]
         ll = str(cx)+','+str(cy)
-        plt.scatter(cx,cy,facecolors='none',s= 100,label=ll,color=colors[kdx])
+        #plt.scatter(cx,cy,facecolors='none',s= 100,label=ll,color=colors[kdx])
+        plt.scatter(cx,cy,facecolors='none',s= 100,label=ll,color='black')
 
 plt.ylim(-4000,4000)
 plt.xlim(-4000,5000)
