@@ -27,7 +27,7 @@ for idx in range(data.index.stop) :
 for jdx in range(df.index.stop):
     px = df.x[jdx]
     py  = df.y[jdx]
-    #plt.scatter(px,py,20,color='black',marker='o')
+    plt.scatter(px,py,20,color='black',marker='o')
     
 for kdx in range(df_clus.index.stop):
     cx = df_clus.x[kdx]

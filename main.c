@@ -6,6 +6,8 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include <limits.h>
+
+
 #include "xypicmic.h"
 
 int main(int argc, char *argv[]) {
@@ -98,7 +100,7 @@ int main(int argc, char *argv[]) {
     fprintf(csvFile2, "numCluster;centroidFlag; centroid3Colors;x;y\n"); 
     for (int idx=0 ; idx< interCount;  idx++){
         if ( centroids[idx].num>-1 && centroids[idx].flag == 7 )
-        fprintf(csvFile2,"%d;%d;%d;%.04f;%0.4f\n",centroids[idx].num,centroids[idx].flag, centroids[idx].intersects, centroids[idx].x, centroids[idx].y);
+        fprintf(csvFile2,"%d;%ld;%d;%.04f;%0.4f\n",centroids[idx].num,centroids[idx].flag, centroids[idx].intersects, centroids[idx].x, centroids[idx].y);
     }
     fclose(csvFile2);
 

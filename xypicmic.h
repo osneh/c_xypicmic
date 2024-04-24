@@ -44,7 +44,6 @@ void fillLines(char * [],LineCoordinates *, int, int *, int *, int *);
 int colorFlag(char, char);
 int assign_number(char);
 void printIntersectionPoint(IntersectionPoint *item, int numIP);
-void printIntersectionPoint0(IntersectionPoint *item);
 void init_array(IntersectionPoint *, int);
 unsigned char fill_bits(unsigned char, int);
 

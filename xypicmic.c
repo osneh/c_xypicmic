@@ -13,21 +13,10 @@ void printIntersectionPoint(IntersectionPoint *item, int numIP) {
   //   printf("Printing %d persons:\n", numIP);
     for (int i = 0; i < numIP; ++i) {
 printf("[%2d],x,y,bool,flag=", i+1);
-printf("%f,%f,\t%d, %d:\n", item[i].x, item[i].y, item[i].intersects, item[i].flag);
+printf("%f,%f,\t%d, %ld:\n", item[i].x, item[i].y, item[i].intersects, item[i].flag);
     }
 }
 
-// surcharge pour val par defaut imprime tout
-void printIntersectionPoint0(IntersectionPoint *item) {
-  //     int numIP=sizeof(item) / sizeof(*item);
-  int numIP=sizeof(item) / sizeof(item[0]); //<= marche pas?
-     printf("numIP %d, %d, %d\n", numIP, sizeof(item), sizeof(item[0]));
-/*   int numIP=0; */
-/* while ((item + numIP)->x[0] != '\0') { */
-/*         numIP++; */
-/*     } */
-    printIntersectionPoint(item, numIP);
-}
 
 void replaceBackslashes(char *str) {
     while (*str) {
@@ -81,7 +70,7 @@ LineCoordinates calculateLineCoordinates(char lineType, int value) {
 }
 
 IntersectionPoint calculateIntersection(LineCoordinates line1, LineCoordinates line2) {
-    IntersectionPoint result = {INFINITY, INFINITY, false, 1};
+    IntersectionPoint result = {.x=INFINITY, .y=INFINITY, .intersects=false, .flag=1, .num=0};
     double denominator = (line1.x_start - line1.x_end) * (line2.y_start - line2.y_end) -
                          (line1.y_start - line1.y_end) * (line2.x_start - line2.x_end);
 
@@ -141,7 +130,7 @@ void splitLineColor(LineCoordinates *Items, int nItems, LineCoordinates *ly, Lin
     }
 }
 
-void xLines(IntersectionPoint *intersecs, int nIntersecs,LineCoordinates *yellow, int y_size, LineCoordinates *red, int r_size, LineCoordinates * blue, int b_size, int * counter){
+void xLines(IntersectionPoint *intersecs, int nIntersecs, LineCoordinates *yellow, int y_size, LineCoordinates *red, int r_size, LineCoordinates * blue, int b_size, int * counter){
         int iCount =0;
         //printf("----------------------------------\n");
         if (y_size>0){
