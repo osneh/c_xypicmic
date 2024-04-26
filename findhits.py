@@ -21,12 +21,15 @@ with open('picmic_adress_table.tab', 'r') as faddress:
         line_address[(row, col)] = gline
 
 #-------------------------------------------------- START reference Henso algorithm -----------------------------------------------------------
-Ymax = 852*7.5*0.5;
-tang60 = math.sqrt(3);
-Xmax = (Ymax*2)/math.sqrt(3);
-deltax = Xmax*(2./852);
+
 
 class GLine:
+
+    Ymax = 852*7.5*0.5;
+    tang60 = math.sqrt(3);
+    Xmax = (Ymax*2)/math.sqrt(3);
+    deltax = Xmax*(2./852);
+
     __slots__ = ('x_start', 'y_start', 'x_end', 'y_end', 'color', 'val')
     
     def __init__(self, color, val):
@@ -38,18 +41,18 @@ class GLine:
         if self.color == 'Y':
             self.y_start = (self.val-426) * 7.5
             self.y_end = (self.val-426) * 7.5
-            self.x_start = -Xmax
-            self.x_end = +Xmax
+            self.x_start = -GLine.Xmax
+            self.x_end = +GLine.Xmax
         elif self.color == 'R':
-            self.y_start = -Ymax
-            self.y_end = Ymax
-            self.x_start =  Ymax/tang60 - deltax*self.val
-            self.x_end =   Xmax + Ymax/tang60 - deltax*self.val
+            self.y_start = -GLine.Ymax
+            self.y_end = GLine.Ymax
+            self.x_start =  GLine.Ymax/GLine.tang60 - GLine.deltax*self.val
+            self.x_end =   GLine.Xmax + GLine.Ymax/GLine.tang60 - GLine.deltax*self.val
         elif self.color == 'B':
-            self.y_start = Ymax
-            self.y_end = -Ymax
-            self.x_start = -Xmax - Ymax/tang60 + deltax*self.val;
-            self.x_end = -Ymax/tang60 + deltax*self.val;
+            self.y_start = GLine.Ymax
+            self.y_end = -GLine.Ymax
+            self.x_start = -GLine.Xmax - GLine.Ymax/GLine.tang60 + GLine.deltax*self.val;
+            self.x_end = -GLine.Ymax/GLine.tang60 + GLine.deltax*self.val;
 
     def __repr__(self):
         return f"GLine({self.color}{self.val}, start=({self.x_start:.2f}, {self.y_start:.2f}), end=({self.x_end:.2f}, {self.y_end:.2f}))"
@@ -212,7 +215,8 @@ class FatLine:
         
     def __repr__(self):
         return f"FatLine( vmin={self.vmin}, vmax={self.vmax}, density={self.density:.2f}, free={self.free})"
-        
+
+
 def getLines(event):
     """
     The line number are offseted to have an easier invariant.
@@ -403,12 +407,16 @@ def findClusters(all_lines, fatline_cut, fatintersect_cut):
     
     
 
-
-
+Ymin, Ymax = 0, 851
+Bmin, Bmax = 0, 851
+Rmin, Rmax = -427, 424
+# sensor diagonals follow the y-b-r=0 invariant
+Ydiag = Rmax+Bmin
+Bdiag = Ymin-Rmin
+Rdiag = Bmin-Ymin
 def plotEvent(n,*, all_lines=[], kintersections=[], clusters=[]):
 
-    # todo: write the hardcoded values in terms of ymin, ymax, bmin, bmax, rmin, rmax
-    sensor_edges =   [(-1, -1), (427, -1), (852, 424), (852, 852), (427, 852), (-1, 424)]
+    sensor_edges =   [(Bmin-1,Ymin-1),(Bdiag,Ymin-1),(Bmax+1,Ydiag),(Bmax+1,Ymax+1),(Bdiag,Ymax+1),(Bmin-1,Ydiag)]
     sensor_edges = [transform(x, y) for x, y in sensor_edges]
     ax = plt.gca()
     ax.add_patch(Polygon(sensor_edges, edgecolor='k', fill=False))
@@ -421,14 +429,14 @@ def plotEvent(n,*, all_lines=[], kintersections=[], clusters=[]):
     if all_lines:
         blines, ylines, rlines = all_lines
         for bline in blines:
-            if bline <= 426:  plot_line((bline, 0), (bline, 424+bline), '-', color='blue', alpha=0.2)
-            else: plot_line((bline, bline-427), (bline, 851), '-', color='blue', alpha=0.2)
+            if bline <= Bdiag:  plot_line((bline, Ymin), (bline, Ydiag+bline), '-', color='blue', alpha=0.2)
+            else: plot_line((bline, bline-Bdiag), (bline, Ymax), '-', color='blue', alpha=0.2)
         for yline in ylines: 
-            if yline <= 424:  plot_line((0, yline), (427+yline, yline), '-', color='yellow', alpha=0.2)
-            else:  plot_line((yline-424, yline), (851, yline), '-', color='yellow', alpha=0.2)
+            if yline <= Ydiag:  plot_line((0, yline), (Bdiag+yline, yline), '-', color='yellow', alpha=0.2)
+            else:  plot_line((yline-Rmax, yline), (Bmax, yline), '-', color='yellow', alpha=0.2)
         for rline in rlines: 
-            if rline <= 0: plot_line((-rline, 0), (851, 851+rline), '-', color='red', alpha=0.2)
-            else:  plot_line((0, rline), (851-rline, 851), '-', color='red', alpha=0.2)
+            if rline <= Rdiag: plot_line((-rline,  Ymin), (Bmax,  Ymax+rline), '-', color='red', alpha=0.2)
+            else:  plot_line((Bmin, rline), (Bmax-rline, Ymax), '-', color='red', alpha=0.2)
 
     if kintersections:
         B, Y = [], []
@@ -461,7 +469,9 @@ def plotEvent(n,*, all_lines=[], kintersections=[], clusters=[]):
     
     
 def main():
-
+    #plotEvent(-1, all_lines=(list(range(Bmin,Bmax+1,1)), list(range(Ymin,Ymax+1,1)), list(range(Rmin,Rmax+1,1))))#clusters=clusters,kintersections=kintersections)
+    #plt.show()
+    #sys.exit(1)
     file = 'more_events.txt'
     result_dir = file.removesuffix('.txt')
     with open(file, 'r') as fevents:
@@ -480,7 +490,7 @@ def main():
                 event.append((nums[1+2*i], nums[2+2*i]))
                 
             #if not (15 <= n+1 <= 50): continue
-            #if n+1 != 7: continue
+            #if n+1 != 149: continue
             #if n+1 < 471: continue
             
             print(f"--------------------------- {1+n} ----------------------------------")
