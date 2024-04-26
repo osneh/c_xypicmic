@@ -20,7 +20,7 @@ with open('picmic_adress_table.tab', 'r') as faddress:
         gline = (gline[0], int(gline[2:-1]))
         line_address[(row, col)] = gline
 
-
+#-------------------------------------------------- START reference Henso algorithm -----------------------------------------------------------
 Ymax = 852*7.5*0.5;
 tang60 = math.sqrt(3);
 Xmax = (Ymax*2)/math.sqrt(3);
@@ -195,11 +195,18 @@ def findHitsRef(event, cluster_threshold, n, *, plot=False):
         #plt.show()
     return hits
    
+#-------------------------------------------------- END reference Henso algorithm -----------------------------------------------------------
+
 
 def getLines(event):
     """
     The line number are offseted to have an easier invariant.
     With this numbering, we have -1 <= y-b-r <= +1 at every three color intersection
+    And we have:
+          0  <= b <= 851
+          0  <= y <= 851
+        -427 <= r <= 424
+        
     """
     # get line for each row, col pair
     blines, ylines, rlines = [], [], []
@@ -222,8 +229,10 @@ def getLines(event):
 def transform(x, y):
     """ transform coordinate with a 30° rotation on the y-axis"""
     return x-y/2, y*math.sqrt(3)/2
+    #return x, y
     
 def findKintersections(all_lines):
+    """ Very easy to find triple intersection with good line coordinates"""
     blines, ylines, rlines = all_lines
     kintersections = []
     for y in ylines:
@@ -274,9 +283,7 @@ def findClusters(all_lines, fatline_cut, fatintersect_cut):
                 # print(r0,r1)
                 # print(y0-b0,y1-b1,y1-b0,y0-b1)
                 # print()
-                #if  r0 <= y0-b0 <= r1 or  r0 <= y1-b1 <= r1 or r0 <= y1-b0 <= r1 or r0 <= y0-b1 <= r1: # if the three fat lines intersect
                 if r0 <= y0-b1 <= r1 or  r0 <= y1-b0 <= r1 or y0-b1 <= r0 <= y1-b0 or  y0-b1 <= r1 <= y1-b0: # if the three fat lines intersect
-                    # print('ha')
                     edges = []
                     p0, p1 = (max(b0, y0-r1), y0), (min(b1,y0-r0), y0) # on the  y0 line
                     if p0[0] <= p1[0]: edges.append((p0, p1))
@@ -288,14 +295,14 @@ def findClusters(all_lines, fatline_cut, fatintersect_cut):
                     if p0[1] <= p1[1]: edges.append((p0, p1))
                     
                     p0, p1 = (b1, max(y0,r0+b1)), (b1, min(y1, r1+b1)) # on the b1 line
-                    if   p0[1] <= p1[1]: edges.append((p0, p1))
+                    if p0[1] <= p1[1]: edges.append((p0, p1))
                     
                     p0, p1 = (y0-r0, y0) if y0 >= b0+r0 else (b0, r0+b0), (y1-r0, y1) if y1 <= b1+r0 else (b1, r0+b1) # on the r0 line
                     if p0[0] <= p1[0] and p0[1] <= p1[1]: edges.append((p0, p1))
                     
                     p0, p1 = (y0-r1, y0) if y0 >= b0+r1 else (b0, r1+b0), (y1-r1, y1) if y1 <= b1+r1 else (b1, r1+b1) # on the r1 line
                     if p0[0] <= p1[0] and p0[1] <= p1[1]: edges.append((p0, p1))
-                    clusters.append(edges)
+                    clusters.append((edges, 0b111))
 
             if is_fat_intersect(y0,y1,b0,b1): # keep really fat intersection even if only two lines intersect
                 edges = []
@@ -310,7 +317,7 @@ def findClusters(all_lines, fatline_cut, fatintersect_cut):
                 
                 p0, p1 = (b1, y0), (b1,y1) # on the b1 line
                 if   p0[1] <= p1[1]: edges.append((p0, p1))
-                clusters.append(edges)
+                clusters.append((edges, 0b011))
                     
                 
         for r0, r1 in fat_rlines:
@@ -327,7 +334,7 @@ def findClusters(all_lines, fatline_cut, fatintersect_cut):
                 
                 p0, p1 = (y0-r1, y0) , (y1-r1, y1) # on the r1 line
                 if p0[0] <= p1[0] and p0[1] <= p1[1]: edges.append((p0, p1))
-                clusters.append(edges)
+                clusters.append((edges, 0b101))
                     
                     
     for b0, b1 in fat_blines:
@@ -345,7 +352,7 @@ def findClusters(all_lines, fatline_cut, fatintersect_cut):
                 
                 p0, p1 = (b0, r1+b0), (b1, r1+b1) # on the r1 line
                 if p0[0] <= p1[0] and p0[1] <= p1[1]: edges.append((p0, p1))
-                clusters.append(edges)
+                clusters.append((edges, 0b110))
     #pprint(clusters)
     
     return clusters
@@ -356,7 +363,7 @@ def findClusters(all_lines, fatline_cut, fatintersect_cut):
 
 def plotEvent(n,*, all_lines=[], kintersections=[], clusters=[]):
 
-    sensor_edges =   [(0, 0), (427, 0), (851, 427), (851, 851), (427, 851), (0, 427)]
+    sensor_edges =   [(-1, -1), (427, -1), (852, 424), (852, 852), (427, 852), (-1, 424)]
     sensor_edges = [transform(x, y) for x, y in sensor_edges]
     ax = plt.gca()
     ax.add_patch(Polygon(sensor_edges, edgecolor='k', fill=False))
@@ -366,13 +373,20 @@ def plotEvent(n,*, all_lines=[], kintersections=[], clusters=[]):
             x1, y1 = transform(*p1)
             ax.plot([x0,x1], [y0,y1], *args, **kwargs)
             
-    if lines:
+    if all_lines:
         blines, ylines, rlines = all_lines
-        for bline in blines: plot_line((bline, 0), (bline, 851), '--', color='blue', alpha=0.3)
-        for yline in ylines: plot_line((0, yline), (851, yline), '--', color='yellow', alpha=0.3)
-        for rline in rlines: plot_line((-rline, 0), (851-rline, 851), '--', color='red', alpha=0.3)
+        for bline in blines:
+            if bline <= 426:  plot_line((bline, 0), (bline, 424+bline), '-', color='blue', alpha=0.2)
+            else: plot_line((bline, bline-427), (bline, 851), '-', color='blue', alpha=0.2)
+        for yline in ylines: 
+            if yline <= 424:  plot_line((0, yline), (427+yline, yline), '-', color='yellow', alpha=0.2)
+            else:  plot_line((yline-424, yline), (851, yline), '-', color='yellow', alpha=0.2)
+        for rline in rlines: 
+            if rline <= 0: plot_line((-rline, 0), (851, 851+rline), '-', color='red', alpha=0.2)
+            else:  plot_line((0, rline), (851-rline, 851), '-', color='red', alpha=0.2)
 
     if kintersections:
+        B, Y = [], []
         for kintersect in kintersections:
             # If we use the blue and yellow lines as a basis for our coordinate system, then not all kintersections
             # are on integer coordinates. In fact it is only the case if yellow-blue = red. Do a diagram if this is not clear
@@ -381,15 +395,17 @@ def plotEvent(n,*, all_lines=[], kintersections=[], clusters=[]):
                 b, y = b+1/3, y-1/3
             elif y-b < r:
                 b, y = b-1/3, y+1/3
-            kintersect = b, y
-            ax.scatter(*transform(*kintersect), marker='o', color='k')#clist[cluster%len(clist)], alpha=0.2)
             #ax.add_patch(RegularPolygon(transform(b, y), facecolor=clist[cluster%len(clist)], numVertices=3, radius=1, orientation=-math.pi/6))
+            B.append(b-y/2)
+            Y.append(y*math.sqrt(3)/2)
+        ax.scatter(B, Y, marker='o', color='k', alpha=0.2)
+            
 
     if clusters:
-        for idx, edge_list in enumerate(clusters):
+        for idx, (edge_list, cluster_type) in enumerate(clusters):
             X,Y = [],[]
             for p0, p1 in edge_list:
-                plot_line(p0, p1, '-', color='magenta')
+                plot_line(p0, p1, '-', color='magenta' if cluster_type==0b111 else 'cyan', zorder=50 if cluster_type==0b111 else 10)
                 X.append(p0[0]-p0[1]/2) , X.append(p1[0]-p1[1]/2)
                 Y.append(p0[1]*math.sqrt(3)/2) , Y.append(p1[1]*math.sqrt(3)/2)
 
@@ -397,40 +413,52 @@ def plotEvent(n,*, all_lines=[], kintersections=[], clusters=[]):
     ax.set_title(f"PICMIC$0$ event ${n}$")
     
     
-with open('more_events.txt', 'r') as fevents:
-    found_hit = 0
-    for n, line in enumerate(fevents):
-        if line.strip().startswith('#'):
-            continue
-        
-        nums = list(map(int, line.split()))
-        if len(nums) != 2*nums[0] + 1:
-            print(nums)
-            print("Error - event contains a non consistent list of numbers, skipped")
-            continue
-        event = []
-        for i in range(nums[0]):
-            event.append((nums[1+2*i], nums[2+2*i]))
+    
+def main():
+
+    file = 'more_events.txt'
+    result_dir = file.removesuffix('.txt')
+    with open(file, 'r') as fevents:
+        found_hit = 0
+        for n, line in enumerate(fevents):
+            if line.strip().startswith('#'):
+                continue
             
-        if not (15 <= n+1 <= 50): continue
-        #if n+1 != 428: continue
-        #if n+1 < 471: continue
-        
-        #findHitsRef(event, 100, n+1, plot=True), plt.figure()
-        
-        lines = getLines(event)
-        #kintersections = findKintersections(lines)
-        clusters = findClusters(lines, fatline_cut=20, fatintersect_cut=45)
-        
-        print(clusters)
-        plotEvent(n+1, all_lines=lines, clusters=clusters)#,kintersections=kintersections,)
-        plt.show()
-        
-        # if not clusters:
-            # print(f"--------------------------- {1+n} ----------------------------------")
-            # #plotEvent(n+1, all_lines=lines, clusters=clusters)#,kintersections=kintersections,)
-            # #plt.show()
-        # else:
-            # found_hit += 1
-    # print(f"found hit in {found_hit}/{n} events")
+            nums = list(map(int, line.split()))
+            if len(nums) != 2*nums[0] + 1:
+                print(nums)
+                print("Error - event contains a non consistent list of numbers, skipped")
+                continue
+            event = []
+            for i in range(nums[0]):
+                event.append((nums[1+2*i], nums[2+2*i]))
+                
+            if not (15 <= n+1 <= 50): continue
+            #if n+1 != 78: continue
+            #if n+1 < 471: continue
             
+            print(f"--------------------------- {1+n} ----------------------------------")
+            #findHitsRef(event, 100, n+1, plot=True), plt.figure()
+            
+            lines = getLines(event)
+            kintersections = findKintersections(lines)
+            clusters = findClusters(lines, fatline_cut=20, fatintersect_cut=45)
+            
+            #print(clusters)
+            plotEvent(n+1, all_lines=lines, clusters=clusters,kintersections=kintersections)
+            #plt.savefig(f"{result_dir}/{n+1}.png")
+            #plt.clf()
+            plt.show()
+            
+            # if not clusters:
+                #
+                # #plotEvent(n+1, all_lines=lines, clusters=clusters)#,kintersections=kintersections,)
+                # #plt.show()
+            # else:
+                # found_hit += 1
+        # print(f"found hit in {found_hit}/{n} events")
+            
+if __name__ == "__main__":
+    #import cProfile
+    #cProfile.run('main()')
+    main()
