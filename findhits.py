@@ -198,6 +198,21 @@ def findHitsRef(event, cluster_threshold, n, *, plot=False):
 #-------------------------------------------------- END reference Henso algorithm -----------------------------------------------------------
 
 
+class FatLine:
+    __slots__ = ('vmin', 'vmax', 'width', 'density', 'free')
+
+    def __init__(self, vmin, vmax, n):
+       self.vmin = vmin
+       self.vmax = vmax
+       self.width = vmax-vmin+1
+       self.density = n/(self.width)
+       self.free = True
+        
+
+        
+    def __repr__(self):
+        return f"FatLine( vmin={self.vmin}, vmax={self.vmax}, density={self.density:.2f}, free={self.free})"
+        
 def getLines(event):
     """
     The line number are offseted to have an easier invariant.
@@ -229,7 +244,7 @@ def getLines(event):
 def transform(x, y):
     """ transform coordinate with a 30° rotation on the y-axis"""
     return x-y/2, y*math.sqrt(3)/2
-    #return x, y
+    return x, y
     
 def findKintersections(all_lines):
     """ Very easy to find triple intersection with good line coordinates"""
@@ -248,19 +263,23 @@ def findClusters(all_lines, fatline_cut, fatintersect_cut):
         lines_ = []
         last = None
         fat = None
+        nline = 0
         for l in lines:
             if last is None:
                 last = l
                 fat = l
+                nline = 1
             else:
                 if l - last < fatline_cut:
                     last = l
+                    nline +=1
                 else:
-                    lines_.append((fat, last))
+                    lines_.append(FatLine(fat, last, nline))
                     last = l
                     fat = l
+                    nline =1
         if last is not None:
-            lines_.append((fat, last))
+            lines_.append(FatLine(fat, last, nline))
         return lines_
         
     blines, ylines, rlines = all_lines
@@ -273,17 +292,25 @@ def findClusters(all_lines, fatline_cut, fatintersect_cut):
     # print(fat_blines)
     # print(fat_rlines)
     
-    def is_fat_intersect(min0, max0, min1, max1):
-       return max0-min0 > fatintersect_cut/10 and max1-min1 > fatintersect_cut/10 and max0-min0 + max1-min1 > fatintersect_cut
+    def is_fat_intersect(f0, f1):
+       return f0.free and f1.free and min(f0.width, f1.width)*fatline_cut >= max(f0.width, f1.width) and f0.width+f1.width > fatintersect_cut
        
     clusters = []
-    for y0, y1 in fat_ylines:
-        for b0, b1 in fat_blines:
-            for r0, r1 in fat_rlines:
+    for faty in fat_ylines:
+        y0 = faty.vmin
+        y1 = faty.vmax
+        for fatb in fat_blines:
+            b0 = fatb.vmin
+            b1 = fatb.vmax
+            for fatr in fat_rlines:
+                r0 = fatr.vmin
+                r1 = fatr.vmax
                 # print(r0,r1)
                 # print(y0-b0,y1-b1,y1-b0,y0-b1)
                 # print()
-                if r0 <= y0-b1 <= r1 or  r0 <= y1-b0 <= r1 or y0-b1 <= r0 <= y1-b0 or  y0-b1 <= r1 <= y1-b0: # if the three fat lines intersect
+                if ((r0 <= y0-b1 <= r1 or  r0 <= y1-b0 <= r1 or y0-b1 <= r0 <= y1-b0 or  y0-b1 <= r1 <= y1-b0)):# and # if the three fat lines intersect
+                    #min(fatb.width, faty.width, fatr.width)*fatline_cut >= max(fatb.width, faty.width, fatr.width)):  # if the intersection is not too asymetrical
+                    
                     edges = []
                     p0, p1 = (max(b0, y0-r1), y0), (min(b1,y0-r0), y0) # on the  y0 line
                     if p0[0] <= p1[0]: edges.append((p0, p1))
@@ -303,8 +330,19 @@ def findClusters(all_lines, fatline_cut, fatintersect_cut):
                     p0, p1 = (y0-r1, y0) if y0 >= b0+r1 else (b0, r1+b0), (y1-r1, y1) if y1 <= b1+r1 else (b1, r1+b1) # on the r1 line
                     if p0[0] <= p1[0] and p0[1] <= p1[1]: edges.append((p0, p1))
                     clusters.append((edges, 0b111))
+                    # heuristic to keep considering fat line for simple intersection if intersection too asymetrical or not dense enough
+                    fatr.free = fatr.width > min(fatb.width, faty.width, fatr.width)*10 and fatr.density < 0.4
+                    fatb.free = fatb.width > min(fatb.width, faty.width, fatr.width)*10 and fatb.density < 0.4
+                    faty.free = faty.width > min(fatb.width, faty.width, fatr.width)*10 and faty.density < 0.4
+                    #print(fatb, faty, fatr)
 
-            if is_fat_intersect(y0,y1,b0,b1): # keep really fat intersection even if only two lines intersect
+    for faty in fat_ylines:
+        y0 = faty.vmin
+        y1 = faty.vmax
+        for fatb in fat_blines:
+            b0 = fatb.vmin
+            b1 = fatb.vmax
+            if is_fat_intersect(faty, fatb): # keep really fat intersection even if only two lines intersect
                 edges = []
                 p0, p1 = (b0, y0), (b1, y0) # on the  y0 line
                 if p0[0] <= p1[0]: edges.append((p0, p1))
@@ -320,8 +358,10 @@ def findClusters(all_lines, fatline_cut, fatintersect_cut):
                 clusters.append((edges, 0b011))
                     
                 
-        for r0, r1 in fat_rlines:
-            if  is_fat_intersect(y0,y1,r0,r1): # keep really fat intersection even if only two lines intersect
+        for fatr in fat_rlines:
+            r0 = fatr.vmin
+            r1 = fatr.vmax
+            if  is_fat_intersect(faty, fatr): # keep really fat intersection even if only two lines intersect
                 edges = []
                 p0, p1 = (y0-r1, y0), (y0-r0, y0) # on the  y0 line
                 if p0[0] <= p1[0]: edges.append((p0, p1))
@@ -337,9 +377,13 @@ def findClusters(all_lines, fatline_cut, fatintersect_cut):
                 clusters.append((edges, 0b101))
                     
                     
-    for b0, b1 in fat_blines:
-        for r0, r1 in fat_rlines:
-            if is_fat_intersect(b0,b1,r0,r1): # keep really fat intersection even if only two lines intersect
+    for fatb in fat_blines:
+        b0 = fatb.vmin
+        b1 = fatb.vmax
+        for fatr in fat_rlines:
+            r0 = fatr.vmin
+            r1 = fatr.vmax
+            if is_fat_intersect(fatb, fatr): # keep really fat intersection even if only two lines intersect
                 edges = []
                 p0, p1 = (b0, r0+b0), (b0,r1+b0) # on the b0 line
                 if p0[1] <= p1[1]: edges.append((p0, p1))
@@ -363,6 +407,7 @@ def findClusters(all_lines, fatline_cut, fatintersect_cut):
 
 def plotEvent(n,*, all_lines=[], kintersections=[], clusters=[]):
 
+    # todo: write the hardcoded values in terms of ymin, ymax, bmin, bmax, rmin, rmax
     sensor_edges =   [(-1, -1), (427, -1), (852, 424), (852, 852), (427, 852), (-1, 424)]
     sensor_edges = [transform(x, y) for x, y in sensor_edges]
     ax = plt.gca()
@@ -396,8 +441,9 @@ def plotEvent(n,*, all_lines=[], kintersections=[], clusters=[]):
             elif y-b < r:
                 b, y = b-1/3, y+1/3
             #ax.add_patch(RegularPolygon(transform(b, y), facecolor=clist[cluster%len(clist)], numVertices=3, radius=1, orientation=-math.pi/6))
-            B.append(b-y/2)
-            Y.append(y*math.sqrt(3)/2)
+            b_, y_ = transform(b, y)
+            B.append(b_)
+            Y.append(y_)
         ax.scatter(B, Y, marker='o', color='k', alpha=0.2)
             
 
@@ -433,16 +479,17 @@ def main():
             for i in range(nums[0]):
                 event.append((nums[1+2*i], nums[2+2*i]))
                 
-            if not (15 <= n+1 <= 50): continue
-            #if n+1 != 78: continue
+            #if not (15 <= n+1 <= 50): continue
+            #if n+1 != 7: continue
             #if n+1 < 471: continue
             
             print(f"--------------------------- {1+n} ----------------------------------")
             #findHitsRef(event, 100, n+1, plot=True), plt.figure()
             
             lines = getLines(event)
+            if not(lines[0] and lines[1]) or not(lines[0] and lines[2]) or not(lines[1] and lines[2]): continue 
             kintersections = findKintersections(lines)
-            clusters = findClusters(lines, fatline_cut=20, fatintersect_cut=45)
+            clusters = findClusters(lines, fatline_cut=40, fatintersect_cut=45)
             
             #print(clusters)
             plotEvent(n+1, all_lines=lines, clusters=clusters,kintersections=kintersections)
