@@ -1,115 +1,88 @@
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <time.h>
-#include <stdbool.h>
-#include <unistd.h>
-#include <limits.h>
+#include <errno.h>
+
+/* should be in stdio but not on Windows apparently */
+ssize_t getline(char **buf, size_t *bufsiz, FILE *fp);
+ssize_t getdelim(char **buf, size_t *bufsiz, int delimiter, FILE *fp);
 
 
 #include "xypicmic.h"
+#include "color.h"
+#include "mlog.h"
 
-int main(int argc, char *argv[]) {
-    //Sanity Checks
-    if (argc < 3) {
-        printf("Usage: %s <number of elements> <list of row and column pairs>\n", argv[0]);
-        return 1;
-    }
-
-    int threshold = atoi(argv[1]);
-    int numElements = atoi(argv[2]);
-    if (numElements < 1 || argc !=3 + numElements * 2) {
-        printf("Invalid number of arguments. Please provide the correct number of row and column pairs.\n");
-        return 1;
+int main(int argc, char** argv)
+{
+    int ret = EXIT_SUCCESS;
+    char* txtptr = NULL;
+    const char* event_file_name = "events.txt";
+    
+    if (argc > 1) {
+       event_file_name = argv[1];   
     }
     
-    // ----------------------------------------------------------------  
-    // fill array of lines per Event and count lines by color  
-    // ----------------------------------------------------------------  
-    LineCoordinates *lineInEvent = (LineCoordinates *)malloc(numElements * sizeof(LineCoordinates));
+    FILE* event_file = fopen(event_file_name, "r");
+    if (event_file == NULL) {
+        LOG_ERROR("%s: %s\n", __func__, strerror(errno));
+        ret = EXIT_FAILURE;
+        goto main_cleanup;
+    }
+  
     
-    int y_size=0; int r_size=0; int b_size=0; 
-    fillLines(argv, lineInEvent, numElements, &y_size, &r_size, &b_size);
+    int event[MAX_EVENT_SIZE];
+    size_t event_size = 0;
+    struct event_lines lines;
+    struct event_fat_lines fat_lines;
+    struct event_clusters clusters;
+    size_t txt_maxsize = 0;
+    int event_number = 0;
+    while(getline(&txtptr, &txt_maxsize, event_file) > 0) {
+        
+        memset(event, 0, MAX_EVENT_SIZE*sizeof(*event)); 
+        event_size = 0;
 
-    // -----------------------------------------------------------------
-    // Arrays of struct allocation (according ot its' color)
-    // -----------------------------------------------------------------
-    LineCoordinates *ylines = (LineCoordinates *)malloc(y_size * sizeof(LineCoordinates));
-    LineCoordinates *rlines = (LineCoordinates *)malloc(r_size * sizeof(LineCoordinates));
-    LineCoordinates *blines = (LineCoordinates *)malloc(b_size * sizeof(LineCoordinates));
-    
-    splitLineColor(lineInEvent,numElements,ylines,rlines,blines);
-
-    //  printout all lines in event :
-    char filename[]="xlines.csv";
-    FILE *csvFile = fopen(filename, "w");
-        if (csvFile == NULL) {
-            perror("Error opening CSV file");
-            return -1;
+        int ret_scanf = 0;
+        int n_scanf = 0;
+        int txtoffset = 0;
+        
+        while (1) {
+            if (event_size >= MAX_EVENT_SIZE) {
+                LOG_ERROR("%s: event too large", __func__);
+                break;
+            }
+            ret_scanf = sscanf((txtptr+txtoffset), " %d%n", &event[event_size], &n_scanf);
+            
+            if (ret_scanf == 1) {
+                txtoffset && ++event_size; // ignore first number on line
+                txtoffset += n_scanf;
+            } else {
+                break;
+            }
         }
-
-    char filename1[]="inter.csv";
-    FILE *csvFile1 = fopen(filename1, "w");
-    if (csvFile1 == NULL) {
-        perror("Error opening CSV file");
-        return -1;
+        ++event_number;
+        
+        /*printf("%zu: ", event_size);
+        for(size_t i=0; i<event_size; ++i){
+            printf("%d ", event[i]);
+        }
+        puts("");*/
+        printf("-------------------------------------- %d --------------------------------------\n", event_number);
+        
+        fill_event_lines(&lines, event, event_size);
+        //print_event_lines(&lines);
+        fill_event_fat_lines(&fat_lines, &lines);
+        //print_event_fat_lines(&fat_lines);
+        fill_event_clusters(&clusters, &fat_lines);
+        print_event_clusters(&clusters);
     }
 
-    char filename2[]="centroid.csv";
-    FILE *csvFile2 = fopen(filename2, "w");
-    if (csvFile1 == NULL) {
-        perror("Error opening CSV file");
-        return -1;
+main_cleanup:
+    if(txtptr) {
+        free(txtptr);
     }
-
-    //printf("------------------------->>>>  Lines in Event:  <<<<<<<<<<<<<<<<<-----------------\n");
-    //printf("track;pt0;pt1\n");
-    fprintf(csvFile, "track;pt0;pt1\n"); 
-    for (int idx=0 ; idx< numElements;  idx++){
-        fprintf(csvFile,"%c%d;(%.02f, %0.2f); (%0.2f, %0.2f)\n",lineInEvent[idx].type,lineInEvent[idx].val , lineInEvent[idx].x_start, lineInEvent[idx].y_start, lineInEvent[idx].x_end, lineInEvent[idx].y_end);
-        //printf("%c%d;(%.02f, %0.2f); (%0.2f, %0.2f)\n",lineInEvent[idx].type,lineInEvent[idx].val , lineInEvent[idx].x_start, lineInEvent[idx].y_start, lineInEvent[idx].x_end, lineInEvent[idx].y_end);
+    if (event_file) { 
+        fclose(event_file);
     }
-    fclose(csvFile);
-
-    // -----------------------------------------------------------------
-    // compute intersections, centroids and keep these in an array
-    // -----------------------------------------------------------------
-    int interCount = 0;
-    int combinations = y_size*r_size + y_size*b_size + b_size*r_size;
-    IntersectionPoint *intersections;
-    if (combinations>0){
-        intersections = (IntersectionPoint *)malloc(combinations * sizeof(IntersectionPoint));
-        xLines(intersections,combinations,ylines,y_size,rlines,r_size,blines,b_size,&interCount);
-    }
-
-    fprintf(csvFile1, "x;y\n"); 
-    for (int idx=0 ; idx< interCount;  idx++){
-        //printf("indx=%d, intersects:%d -- ,x0=%.02f, y0=%0.2f\n", idx,intersections[idx].intersects, intersections[idx].x, intersections[idx].y);
-        fprintf(csvFile1,"%.04f;%0.4f\n", intersections[idx].x, intersections[idx].y); 
-    }
-    fclose(csvFile1);
-
-    IntersectionPoint *centroids;//[interCount];
-    //if (interCount>0){
-    centroids = (IntersectionPoint *)malloc(interCount * sizeof(IntersectionPoint));
-    init_array(centroids,interCount);    
-    fillCentroids(threshold, intersections,interCount, centroids, interCount );
-   //}
-
-    fprintf(csvFile2, "numCluster;centroidFlag; centroid3Colors;x;y\n"); 
-    for (int idx=0 ; idx< interCount;  idx++){
-        if ( centroids[idx].num>-1 && centroids[idx].flag == 7 )
-        fprintf(csvFile2,"%d;%ld;%d;%.04f;%0.4f\n",centroids[idx].num,centroids[idx].flag, centroids[idx].intersects, centroids[idx].x, centroids[idx].y);
-    }
-    fclose(csvFile2);
-
-    free(ylines);
-    free(rlines);
-    free(blines);
-    free(intersections);
-    free(lineInEvent);
-    free(centroids);
-
-    return 0; 
+    return ret;
 }

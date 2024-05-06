@@ -201,6 +201,10 @@ def findHitsRef(event, cluster_threshold, n, *, plot=False):
 #-------------------------------------------------- END reference Henso algorithm -----------------------------------------------------------
 
 
+
+
+
+
 class FatLine:
     __slots__ = ('vmin', 'vmax', 'width', 'density', 'free')
 
@@ -211,20 +215,55 @@ class FatLine:
        self.density = n/(self.width)
        self.free = True
         
-
-        
     def __repr__(self):
         return f"FatLine( vmin={self.vmin}, vmax={self.vmax}, density={self.density:.2f}, free={self.free})"
 
+
+Ymin, Ymax = 0, 851
+Bmin, Bmax = 0, 851
+Rmin, Rmax = -427, 424
+Ydiag = Rmax+Bmin
+Bdiag = Ymin-Rmin
+Rdiag = Bmin-Ymin
 
 def getLines(event):
     """
     The line number are offseted to have an easier invariant.
     With this numbering, we have -1 <= y-b-r <= +1 at every three color intersection
-    And we have:
-          0  <= b <= 851
-          0  <= y <= 851
-        -427 <= r <= 424
+    And we have the following sensor map
+          
+          
+                           (427,851)           Y851             (851,851)                  
+                                    +---------------------------+                          
+                                   / \                         / \                         
+                                  /   \                       /   \                        
+                                 /     \                     /     \                       
+                                /       \                   /       \                      
+                               /         \                 /         \                     
+                              /           \               /           \ B851               
+                        R424 /             \             / R0          \                   
+                            /               \           /               \                  
+                           /                 \         /                 \                 
+                          /                   \       /                   \                
+                         /                     \     /                     \               
+                        /                       \   /                       \              
+                       /       Y424              \ /                         \             
+              (0,424) +---------------------------*---------------------------+ (851,424)  
+                       \                         / \                         /             
+                        \                       /   \                       /              
+                         \                     /     \                     /               
+                          \                   /       \                   /                
+                           \                 /         \B427             /                 
+                            \B0             /           \               /R-427             
+                             \             /             \             /                   
+                              \           /               \           /                    
+                               \         /                 \         /                     
+                                \       /                   \       /                      
+                                 \     /                     \     /                       
+                                  \   /                       \   /                        
+                                   \ /           Y0            \ /                         
+                                    +---------------------------+                          
+                                 (0,0)                            (427,0)                  
         
     """
     # get line for each row, col pair
@@ -248,7 +287,7 @@ def getLines(event):
 def transform(x, y):
     """ transform coordinate with a 30° rotation on the y-axis"""
     return x-y/2, y*math.sqrt(3)/2
-    return x, y
+    #return x, y
     
 def findKintersections(all_lines):
     """ Very easy to find triple intersection with good line coordinates"""
@@ -404,16 +443,9 @@ def findClusters(all_lines, fatline_cut, fatintersect_cut):
     #pprint(clusters)
     
     return clusters
-    
-    
 
-Ymin, Ymax = 0, 851
-Bmin, Bmax = 0, 851
-Rmin, Rmax = -427, 424
-# sensor diagonals follow the y-b-r=0 invariant
-Ydiag = Rmax+Bmin
-Bdiag = Ymin-Rmin
-Rdiag = Bmin-Ymin
+
+
 def plotEvent(n,*, all_lines=[], kintersections=[], clusters=[]):
 
     sensor_edges =   [(Bmin-1,Ymin-1),(Bdiag,Ymin-1),(Bmax+1,Ydiag),(Bmax+1,Ymax+1),(Bdiag,Ymax+1),(Bmin-1,Ydiag)]
@@ -472,7 +504,7 @@ def main():
     #plotEvent(-1, all_lines=(list(range(Bmin,Bmax+1,1)), list(range(Ymin,Ymax+1,1)), list(range(Rmin,Rmax+1,1))))#clusters=clusters,kintersections=kintersections)
     #plt.show()
     #sys.exit(1)
-    file = 'more_events.txt'
+    file = 'data_example_6.txt'
     result_dir = file.removesuffix('.txt')
     with open(file, 'r') as fevents:
         found_hit = 0
@@ -490,18 +522,18 @@ def main():
                 event.append((nums[1+2*i], nums[2+2*i]))
                 
             #if not (15 <= n+1 <= 50): continue
-            #if n+1 != 149: continue
+            #if n+1 != 271: continue
             #if n+1 < 471: continue
             
             print(f"--------------------------- {1+n} ----------------------------------")
             #findHitsRef(event, 100, n+1, plot=True), plt.figure()
             
             lines = getLines(event)
-            if not(lines[0] and lines[1]) or not(lines[0] and lines[2]) or not(lines[1] and lines[2]): continue 
+            #if not(lines[0] or lines[1]) or not(lines[0] or lines[2]) or not(lines[1] or lines[2]): continue 
             kintersections = findKintersections(lines)
             clusters = findClusters(lines, fatline_cut=40, fatintersect_cut=45)
             
-            #print(clusters)
+            for cluster in clusters: print(cluster)
             plotEvent(n+1, all_lines=lines, clusters=clusters,kintersections=kintersections)
             #plt.savefig(f"{result_dir}/{n+1}.png")
             #plt.clf()
