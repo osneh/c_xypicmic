@@ -45,14 +45,14 @@ struct event_fat_lines {
     struct fat_line yfat[MAX_FAT_LINES]; /**< 0° angle 'yellow' fat lines      */
     size_t yfat_size;                    /** actual length of the `yfat` array */
     struct fat_line bfat[MAX_FAT_LINES]; /**< 60° angle 'blue' fat lines       */
-    size_t bfat_size;                    /** actual length of the `yfat` array */
+    size_t bfat_size;                    /** actual length of the `bfat` array */
     struct fat_line rfat[MAX_FAT_LINES]; /**< 30° angle 'red' fat lines        */
-    size_t rfat_size;                    /** actual length of the `yfat` array */
+    size_t rfat_size;                    /** actual length of the `rfat` array */
 };
 
 /** @brief Structure representing a PICMIC cluster
  *
- *  A PICMIC event is  list of edges, each described by the x,y coordinates of its endpoints.
+ *  A PICMIC cluster is  list of edges, each described by the x,y coordinates of its endpoints.
  *  Here, we store the x0,y0,x1,y1 values in an array.
  *  Since the cluster is a bounding-box around a fat line intersection, it has necessarly at
  *  most 6 edges, possibly less depending on the details of the intersection

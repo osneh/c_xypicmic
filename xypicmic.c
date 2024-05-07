@@ -1,4 +1,18 @@
-
+/**
+ * @file xypicmic.c
+ * @brief Find cluster hits in picmic sensor data
+ *
+ * There are two main ideas in this code:
+ *     - Work with a coordinate system that minimizes the computation to
+ *       perform on the raw data. We work with the B0 and  Y0 lines as the
+ *       basis of our coordinate system. 
+ *     - Pre-cluster lines in each orientation to minimize the combinatorics.
+ *       We do not consider every line intersection but every fat line intersections.
+ *       Where a fat line is a grouping of nearby lines in a given orientation
+ *
+ * Then, we define clusters as the bounding-box or fat line intersection with some rules
+ * to identify valid intersections.
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
