@@ -10,9 +10,9 @@ LDFLAGS =
 
 SRC = main.c       \
 	  xypicmic.c   \
-	  util/mlog.c  \
-	  util/color.c \
-	  util/getline.c
+	  util\mlog.c  \
+	  util\color.c \
+	  util\getline.c
 OBJ = $(SRC:.c=.o)
 DEP = $(SRC:.c=.d)
 
